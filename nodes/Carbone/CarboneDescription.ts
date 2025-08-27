@@ -1,7 +1,7 @@
 import { INodeProperties } from 'n8n-workflow';
 
-// Resource: Template
-export const templateResource: INodeProperties[] = [
+// Resource unifiée
+export const resource: INodeProperties[] = [
 	{
 		displayName: 'Resource',
 		name: 'resource',
@@ -11,6 +11,10 @@ export const templateResource: INodeProperties[] = [
 			{
 				name: 'Template',
 				value: 'template',
+			},
+			{
+				name: 'Render Document',
+				value: 'renderDocument',
 			},
 		],
 		default: 'template',
@@ -126,22 +130,6 @@ export const templateFields: INodeProperties[] = [
 	...deleteOperation,
 ];
 
-// Resource: Render Document
-export const renderResource: INodeProperties[] = [
-	{
-		displayName: 'Resource',
-		name: 'resource',
-		type: 'options',
-		noDataExpression: true,
-		options: [
-			{
-				name: 'Render Document',
-				value: 'renderDocument',
-			},
-		],
-		default: 'renderDocument',
-	},
-];
 
 // Render Document Operations
 export const renderOperations: INodeProperties[] = [

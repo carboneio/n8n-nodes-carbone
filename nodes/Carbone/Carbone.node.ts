@@ -1,9 +1,8 @@
 import { INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflow';
 import {
-	templateResource,
+	resource,
 	templateOperations,
 	templateFields,
-	renderResource,
 	renderOperations,
 	renderFields,
 	additionalOptions,
@@ -39,14 +38,11 @@ export class Carbone implements INodeType {
 			},
 		},
 		properties: [
-			// Template Resource
-			...templateResource,
+			// Resource unifiée
+			...resource,
 			...templateOperations,
-			...templateFields,
-
-			// Render Document Resource
-			...renderResource,
 			...renderOperations,
+			...templateFields,
 			...renderFields,
 
 			// Additional Options (masquées par défaut)
