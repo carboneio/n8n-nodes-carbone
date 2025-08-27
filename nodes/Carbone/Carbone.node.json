@@ -1,0 +1,20 @@
+{
+	"node": "n8n-nodes-base.Carbone",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": [
+		"Miscellaneous"
+	],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://carbone.io/api-reference.html"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://carbone.io/api-reference.html"
+			}
+		]
+	}
+}
