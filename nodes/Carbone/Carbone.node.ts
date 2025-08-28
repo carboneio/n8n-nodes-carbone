@@ -122,7 +122,20 @@ export class Carbone implements INodeType {
 					formData: formData,
 				});
 
-				returnData.push({ json: response });
+				// Parser la réponse JSON si c'est une chaîne pour éviter le double encodage
+				let parsedResponse;
+				if (typeof response === 'string') {
+					try {
+						parsedResponse = JSON.parse(response);
+					} catch (error) {
+						// Si le parsing échoue, utiliser la réponse originale
+						parsedResponse = response;
+					}
+				} else {
+					parsedResponse = response;
+				}
+
+				returnData.push({ json: parsedResponse });
 			}
 		}
 
