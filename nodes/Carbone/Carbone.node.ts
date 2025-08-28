@@ -101,7 +101,12 @@ export class Carbone implements INodeType {
 
 				// Ajouter le payload si fourni
 				if (payload) {
-					formData.payload = { value: payload };
+					formData.payload = {
+						value: payload,
+						options: {
+							contentType: 'text/plain',
+						},
+					};
 				}
 
 				// Récupérer la version Carbone depuis les additionalOptions
