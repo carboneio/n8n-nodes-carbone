@@ -1,8 +1,4 @@
-import {
-	IAuthenticateGeneric,
-	ICredentialType,
-	INodeProperties,
-} from 'n8n-workflow';
+import { IAuthenticateGeneric, ICredentialType, INodeProperties } from 'n8n-workflow';
 
 export class CarboneApi implements ICredentialType {
 	name = 'carboneApi';
@@ -34,7 +30,7 @@ export class CarboneApi implements ICredentialType {
 		type: 'generic',
 		properties: {
 			headers: {
-				Authorization: '={{$credentials.apiKey}}',
+				Authorization: 'Bearer {{$credentials.apiKey}}',
 			},
 		},
 	};

@@ -66,25 +66,19 @@ export const templateOperations: INodeProperties[] = [
 // Template Fields
 const uploadOperation: INodeProperties[] = [
 	{
-		displayName: 'Template File',
-		name: 'templateFile',
+		displayName: 'Binary Property Name',
+		name: 'binaryPropertyName',
 		type: 'string',
 		required: true,
-		default: '',
-		description: 'The template file to upload (DOCX, ODT, XLSX, ODS, etc.)',
+		default: 'data',
+		description: 'The name of the binary property that contains the template file',
 		displayOptions: {
 			show: {
 				resource: ['template'],
 				operation: ['upload'],
 			},
 		},
-		routing: {
-			request: {
-				body: {
-					template: '={{$value}}',
-				},
-			},
-		},
+		hint: 'Enter the name of the binary field that holds the template file (e.g. data, file, attachment_0, etc.)',
 	},
 	{
 		displayName: 'Payload',
@@ -125,11 +119,7 @@ const deleteOperation: INodeProperties[] = [
 	},
 ];
 
-export const templateFields: INodeProperties[] = [
-	...uploadOperation,
-	...deleteOperation,
-];
-
+export const templateFields: INodeProperties[] = [...uploadOperation, ...deleteOperation];
 
 // Render Document Operations
 export const renderOperations: INodeProperties[] = [
@@ -271,10 +261,7 @@ const getDocumentOperation: INodeProperties[] = [
 	},
 ];
 
-export const renderFields: INodeProperties[] = [
-	...generateOperation,
-	...getDocumentOperation,
-];
+export const renderFields: INodeProperties[] = [...generateOperation, ...getDocumentOperation];
 
 // Additional Options (masquées par défaut)
 export const additionalOptions: INodeProperties[] = [
