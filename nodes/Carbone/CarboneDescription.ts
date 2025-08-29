@@ -35,6 +35,18 @@ export const templateOperations: INodeProperties[] = [
 		},
 		options: [
 			{
+				name: 'List',
+				value: 'list',
+				action: 'List templates',
+				description: 'List templates from Carbone.io',
+				routing: {
+					request: {
+						method: 'GET',
+						url: '/templates',
+					},
+				},
+			},
+			{
 				name: 'Upload',
 				value: 'upload',
 				action: 'Upload template',
@@ -151,7 +163,153 @@ const deleteOperation: INodeProperties[] = [
 	},
 ];
 
-export const templateFields: INodeProperties[] = [...uploadOperation, ...deleteOperation];
+const listOperation: INodeProperties[] = [
+	{
+		displayName: 'Template ID',
+		name: 'id',
+		type: 'string',
+		default: '',
+		description: 'Filter by template ID',
+		displayOptions: {
+			show: {
+				resource: ['template'],
+				operation: ['list'],
+			},
+		},
+		routing: {
+			request: {
+				qs: {
+					id: '={{$value}}',
+				},
+			},
+		},
+	},
+	{
+		displayName: 'Version ID',
+		name: 'versionId',
+		type: 'string',
+		default: '',
+		description: 'Filter by version ID',
+		displayOptions: {
+			show: {
+				resource: ['template'],
+				operation: ['list'],
+			},
+		},
+		routing: {
+			request: {
+				qs: {
+					versionId: '={{$value}}',
+				},
+			},
+		},
+	},
+	{
+		displayName: 'Category',
+		name: 'category',
+		type: 'string',
+		default: '',
+		description: 'Filter by category',
+		displayOptions: {
+			show: {
+				resource: ['template'],
+				operation: ['list'],
+			},
+		},
+		routing: {
+			request: {
+				qs: {
+					category: '={{$value}}',
+				},
+			},
+		},
+	},
+	{
+		displayName: 'Include Versions',
+		name: 'includeVersions',
+		type: 'boolean',
+		default: false,
+		description: 'Whether to include all versions for a specific template ID',
+		displayOptions: {
+			show: {
+				resource: ['template'],
+				operation: ['list'],
+			},
+		},
+		routing: {
+			request: {
+				qs: {
+					includeVersions: '={{$value}}',
+				},
+			},
+		},
+	},
+	{
+		displayName: 'Search',
+		name: 'search',
+		type: 'string',
+		default: '',
+		description: 'Search in template name (fuzzy search), version ID (exact) or template ID (exact)',
+		displayOptions: {
+			show: {
+				resource: ['template'],
+				operation: ['list'],
+			},
+		},
+		routing: {
+			request: {
+				qs: {
+					search: '={{$value}}',
+				},
+			},
+		},
+	},
+	{
+		displayName: 'Limit',
+		name: 'limit',
+		type: 'number',
+		typeOptions: {
+			minValue: 1,
+		},
+		default: 50,
+		description: 'Max number of results to return',
+		displayOptions: {
+			show: {
+				resource: ['template'],
+				operation: ['list'],
+			},
+		},
+		routing: {
+			request: {
+				qs: {
+					limit: '={{$value}}',
+				},
+			},
+		},
+	},
+	{
+		displayName: 'Cursor',
+		name: 'cursor',
+		type: 'string',
+		default: '',
+		description: 'A cursor to use in pagination',
+		displayOptions: {
+			show: {
+				resource: ['template'],
+				operation: ['list'],
+			},
+		},
+		routing: {
+			request: {
+				qs: {
+					cursor: '={{$value}}',
+				},
+			},
+		},
+	},
+];
+
+export const templateFields: INodeProperties[] = [...uploadOperation, ...deleteOperation, ...listOperation];
 
 // Render Document Operations
 export const renderOperations: INodeProperties[] = [

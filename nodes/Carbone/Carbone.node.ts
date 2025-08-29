@@ -96,7 +96,43 @@ export class Carbone implements INodeType {
 				let result: INodeExecutionData;
 
 				if (resource === 'template') {
-					if (operation === 'upload') {
+					if (operation === 'list') {
+						// Template List Operation
+						const { credentials, carboneVersion } = await getCommonOptions(i);
+
+						// Get all list parameters
+						const id = this.getNodeParameter('id', i, '') as string;
+						const versionId = this.getNodeParameter('versionId', i, '') as string;
+						const category = this.getNodeParameter('category', i, '') as string;
+						const includeVersions = this.getNodeParameter('includeVersions', i, false) as boolean;
+						const search = this.getNodeParameter('search', i, '') as string;
+						const limit = this.getNodeParameter('limit', i, 50) as number;
+						const cursor = this.getNodeParameter('cursor', i, '') as string;
+
+						// Build query parameters
+						const qs: any = {};
+						if (id) qs.id = id;
+						if (versionId) qs.versionId = versionId;
+						if (category) qs.category = category;
+						if (includeVersions) qs.includeVersions = includeVersions;
+						if (search) qs.search = search;
+						if (limit) qs.limit = limit;
+						if (cursor) qs.cursor = cursor;
+
+						// Make the request to list templates
+						const response = await this.helpers.request({
+							method: 'GET',
+							url: `${credentials.apiUrl}/templates`,
+							headers: {
+								Authorization: `Bearer ${credentials.apiKey}`,
+								'carbone-version': carboneVersion,
+							},
+							qs: qs,
+						});
+
+						const parsedResponse = parseResponse(response);
+						result = { json: parsedResponse };
+					} else if (operation === 'upload') {
 						// Template Upload Operation
 						const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
 						const { credentials, carboneVersion } = await getCommonOptions(i);
