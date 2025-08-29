@@ -121,6 +121,28 @@ export const generateOperation: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Download Rendered Document',
+		name: 'download',
+		type: 'boolean',
+		default: false,
+		description:
+			'Whether to download the rendered document directly or just get the render ID to fetch it later',
+		hint: 'If set to true, the node will output the binary file. If false, it will output JSON with the render ID.',
+		displayOptions: {
+			show: {
+				resource: ['renderDocument'],
+				operation: ['generate'],
+			},
+		},
+		routing: {
+			request: {
+				qs: {
+					download: '={{$value}}',
+				},
+			},
+		},
+	},
 ];
 
 export const getDocumentOperation: INodeProperties[] = [
@@ -182,14 +204,6 @@ export const generateAdditionalOptions: INodeProperties[] = [
 				type: 'string',
 				default: '',
 				description: 'The target currency for conversion',
-			},
-			{
-				displayName: 'Download',
-				name: 'download',
-				type: 'boolean',
-				default: false,
-				description:
-					'Whether to download the rendered report directly without storing it on the server',
 			},
 			{
 				displayName: 'Enum',

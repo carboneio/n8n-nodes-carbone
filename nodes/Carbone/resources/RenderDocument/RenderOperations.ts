@@ -10,6 +10,7 @@ export class RenderOperations {
 		const templateId = getNodeParameter('templateId', i) as string;
 		const data = getNodeParameter('data', i) as object;
 		const convertTo = getNodeParameter('convertTo', i, 'pdf') as string;
+		const download = getNodeParameter('download', i, false) as boolean;
 		const additionalOptions = getNodeParameter('generateAdditionalOptions', i, {}) as any;
 
 		const credentials = (await getCredentials('carboneApi')) as any;
@@ -39,26 +40,24 @@ export class RenderOperations {
 			if (additionalOptions.hardRefresh) requestBody.hardRefresh = additionalOptions.hardRefresh;
 		}
 
-		let url = `${credentials.apiUrl}/render/${templateId}`;
-		if (additionalOptions.download) {
-			url += '?download=true';
-		}
-
 		const response = await helpers.request({
 			method: 'POST',
-			url,
+			url: `${credentials.apiUrl}/render/${templateId}`,
+			qs: {
+				download: download ? 'true' : undefined,
+			},
 			headers: {
 				Authorization: `Bearer ${credentials.apiKey}`,
 				'carbone-version': credentials.carboneVersion,
 				'Content-Type': 'application/json',
 			},
 			body: requestBody,
-			json: !additionalOptions.download,
-			encoding: additionalOptions.download ? null : undefined,
-			resolveWithFullResponse: additionalOptions.download,
+			json: !download,
+			encoding: download ? null : undefined,
+			resolveWithFullResponse: download,
 		});
 
-		if (additionalOptions.download) {
+		if (download) {
 			// Extraire le nom du fichier depuis Content-Disposition
 			const contentDisposition = response.headers['content-disposition'] || '';
 			let fileName = 'document'; // fallback par défaut
