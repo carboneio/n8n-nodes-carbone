@@ -12,16 +12,25 @@
 ### Routes API Carbone.io complètes :
 - **Template Management**:
   - `POST /template` - Upload template (multipart/form-data ou JSON)
+    - Paramètres:
+      - FormData `versioning`: boolean (défaut: true) - Active le versioning des templates
+      - FormData `name`: string - Nom du template
+      - FormData `comment`: string - Commentaire sur le template
+      - FormData `deployedAt`: date - Date de déploiement (When a report is generated using the new template ID, Carbone selects the template version with the highest deployedAt timestamp that is not in the future)
+      - FormData `template`: fichier - Le fichier de template à uploader
+    - **Important**: Le champ 'versioning' doit être envoyé avant le champ 'template' dans le form-data
   - `GET /template/{templateId}` - Download template file
   - `DELETE /template/{templateId}` - Delete template
+
 - **Document Rendering**:
   - `POST /render/{renderId}` - Generate document from template + JSON data
+    - Paramètres:
+      - Body `data`: JSON dataset requis pour le rendu
+      - Body `convertTo`: Format de conversion (pdf, docx, xlsx, ods, csv, txt, odp, ppt, pptx, jpg, png, odt, doc, html, xml, idml, epub)
   - `GET /render/{renderId}` - Retrieve generated document (file stream)
-- **Paramètres supportés**:
+
+- **Paramètres globaux**:
   - Header `carbone-version`: 4 ou 5 (défaut: 4)
-  - Body `data`: JSON dataset requis pour le rendu
-  - Body `convertTo`: Format de conversion (pdf, docx, xlsx, ods, csv, txt, odp, ppt, pptx, jpg, png, odt, doc, html, xml, idml, epub)
-  - Form `payload`: Optionnel pour générer un template ID différent
 - **Authentification**: Bearer token via header `Authorization`
 - **Host**: api.carbone.io (HTTPS)
 

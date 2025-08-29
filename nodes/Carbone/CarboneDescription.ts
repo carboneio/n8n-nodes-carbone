@@ -81,22 +81,54 @@ const uploadOperation: INodeProperties[] = [
 		hint: 'Enter the name of the binary field that holds the template file (e.g. data, file, attachment_0, etc.)',
 	},
 	{
-		displayName: 'Payload',
-		name: 'payload',
-		type: 'string',
-		default: '',
-		description: 'Optional payload to generate a different template ID',
+		displayName: 'Enable Versioning',
+		name: 'versioning',
+		type: 'boolean',
+		default: true,
+		description: 'Whether to enable template versioning',
 		displayOptions: {
 			show: {
 				resource: ['template'],
 				operation: ['upload'],
 			},
 		},
-		routing: {
-			request: {
-				body: {
-					payload: '={{$value}}',
-				},
+	},
+	{
+		displayName: 'Template Name',
+		name: 'name',
+		type: 'string',
+		default: '',
+		description: 'Name for the template',
+		displayOptions: {
+			show: {
+				resource: ['template'],
+				operation: ['upload'],
+			},
+		},
+	},
+	{
+		displayName: 'Template Comment',
+		name: 'comment',
+		type: 'string',
+		default: '',
+		description: 'Comment for the template',
+		displayOptions: {
+			show: {
+				resource: ['template'],
+				operation: ['upload'],
+			},
+		},
+	},
+	{
+		displayName: 'Deployed At',
+		name: 'deployedAt',
+		type: 'dateTime',
+		default: '',
+		description: 'When a report is generated using the new template ID, Carbone selects the template version with the highest deployedAt timestamp that is not in the future',
+		displayOptions: {
+			show: {
+				resource: ['template'],
+				operation: ['upload'],
 			},
 		},
 	},

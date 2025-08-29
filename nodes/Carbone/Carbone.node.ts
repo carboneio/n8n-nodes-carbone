@@ -99,7 +99,6 @@ export class Carbone implements INodeType {
 					if (operation === 'upload') {
 						// Template Upload Operation
 						const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
-						const payload = this.getNodeParameter('payload', i) as string;
 						const { credentials, carboneVersion } = await getCommonOptions(i);
 
 						// Valider les données binaires
@@ -120,26 +119,39 @@ export class Carbone implements INodeType {
 						const fileBuffer = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
 						const fileName = binaryProperty.fileName || 'template';
 
+						// Get new parameters for template upload
+						const versioning = this.getNodeParameter('versioning', i, true) as boolean;
+						const name = this.getNodeParameter('name', i, '') as string;
+						const comment = this.getNodeParameter('comment', i, '') as string;
+						const deployedAt = this.getNodeParameter('deployedAt', i, '') as string;
+
 						// Préparer le formulaire multipart
-						const formData: any = {
-							template: {
-								value: fileBuffer,
-								options: {
-									filename: fileName,
-									contentType: 'application/octet-stream',
-								},
+						// The 'versioning' field must be sent before the 'template' file field
+						const formData: any = {};
+
+						// Add versioning first as required by the API
+						formData.versioning = versioning ? "true" : "false";
+
+						// Add template file
+						formData.template = {
+							value: fileBuffer,
+							options: {
+								filename: fileName,
+								contentType: 'application/octet-stream',
 							},
 						};
 
-						// Ajouter le payload si fourni
-						if (payload) {
-							formData.payload = {
-								value: payload,
-								options: {
-									contentType: 'text/plain',
-								},
-							};
+						// Add other parameters
+						if (name) {
+							formData.name = name;
 						}
+						if (comment) {
+							formData.comment = comment;
+						}
+						if (deployedAt) {
+							formData.deployedAt = deployedAt;
+						}
+
 
 						// Faire la requête d'upload
 						const response = await this.helpers.request({
