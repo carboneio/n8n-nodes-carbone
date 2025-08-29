@@ -84,45 +84,6 @@ export const uploadOperation: INodeProperties[] = [
 			},
 		},
 	},
-	{
-		displayName: 'Template Name',
-		name: 'name',
-		type: 'string',
-		default: '',
-		description: 'Name for the template',
-		displayOptions: {
-			show: {
-				resource: ['template'],
-				operation: ['upload'],
-			},
-		},
-	},
-	{
-		displayName: 'Template Comment',
-		name: 'comment',
-		type: 'string',
-		default: '',
-		description: 'Comment for the template',
-		displayOptions: {
-			show: {
-				resource: ['template'],
-				operation: ['upload'],
-			},
-		},
-	},
-	{
-		displayName: 'Deployed At',
-		name: 'deployedAt',
-		type: 'dateTime',
-		default: '',
-		description: 'When a report is generated using the new template ID, Carbone selects the template version with the highest deployedAt timestamp that is not in the future',
-		displayOptions: {
-			show: {
-				resource: ['template'],
-				operation: ['upload'],
-			},
-		},
-	},
 ];
 
 export const deleteOperation: INodeProperties[] = [
@@ -228,7 +189,8 @@ export const listOperation: INodeProperties[] = [
 		name: 'search',
 		type: 'string',
 		default: '',
-		description: 'Search in template name (fuzzy search), version ID (exact) or template ID (exact)',
+		description:
+			'Search in template name (fuzzy search), version ID (exact) or template ID (exact)',
 		displayOptions: {
 			show: {
 				resource: ['template'],
@@ -288,6 +250,51 @@ export const listOperation: INodeProperties[] = [
 	},
 ];
 
-export const templateFields: INodeProperties[] = [...uploadOperation, ...deleteOperation, ...listOperation];
+export const templateFields: INodeProperties[] = [
+	...uploadOperation,
+	...deleteOperation,
+	...listOperation,
+];
+
+// Additional Options for Template Upload
+export const templateUploadAdditionalOptions: INodeProperties[] = [
+	{
+		displayName: 'Template Additional Options',
+		name: 'templateUploadAdditionalOptions',
+		type: 'collection',
+		placeholder: 'Add Option',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['template'],
+				operation: ['upload'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Template Name',
+				name: 'name',
+				type: 'string',
+				default: '',
+				description: 'Name for the template',
+			},
+			{
+				displayName: 'Template Comment',
+				name: 'comment',
+				type: 'string',
+				default: '',
+				description: 'Comment for the template',
+			},
+			{
+				displayName: 'Deployed At',
+				name: 'deployedAt',
+				type: 'dateTime',
+				default: '',
+				description:
+					'When a report is generated using the new template ID, Carbone selects the template version with the highest deployedAt timestamp that is not in the future',
+			},
+		],
+	},
+];
 
 // No need to re-export, they're already exported

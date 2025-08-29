@@ -10,6 +10,7 @@ import {
 	resource,
 	templateOperations,
 	templateFields,
+	templateUploadAdditionalOptions,
 	renderOperations,
 	renderFields,
 	additionalOptions,
@@ -53,6 +54,7 @@ export class Carbone implements INodeType {
 			...renderOperations,
 			...templateFields,
 			...renderFields,
+			...templateUploadAdditionalOptions,
 
 			// Additional Options (masquées par défaut)
 			...additionalOptions,
@@ -81,7 +83,7 @@ export class Carbone implements INodeType {
 							i,
 							this.helpers,
 							this.getNodeParameter.bind(this),
-							this.getCredentials.bind(this)
+							this.getCredentials.bind(this),
 						);
 					} else if (operation === 'upload') {
 						// Template Upload Operation
@@ -90,7 +92,7 @@ export class Carbone implements INodeType {
 							this.helpers,
 							this.getNodeParameter.bind(this),
 							this.getCredentials.bind(this),
-							this.getInputData.bind(this)
+							this.getInputData.bind(this),
 						);
 					} else if (operation === 'delete') {
 						// Template Delete Operation
@@ -98,7 +100,7 @@ export class Carbone implements INodeType {
 							i,
 							this.helpers,
 							this.getNodeParameter.bind(this),
-							this.getCredentials.bind(this)
+							this.getCredentials.bind(this),
 						);
 					} else {
 						throw new NodeOperationError(
@@ -113,7 +115,7 @@ export class Carbone implements INodeType {
 							i,
 							this.helpers,
 							this.getNodeParameter.bind(this),
-							this.getCredentials.bind(this)
+							this.getCredentials.bind(this),
 						);
 					} else if (operation === 'get') {
 						// Render Get Operation
@@ -121,7 +123,7 @@ export class Carbone implements INodeType {
 							i,
 							this.helpers,
 							this.getNodeParameter.bind(this),
-							this.getCredentials.bind(this)
+							this.getCredentials.bind(this),
 						);
 					} else {
 						throw new NodeOperationError(
