@@ -37,8 +37,19 @@
       - Body `convertTo`: Format de conversion (pdf, docx, xlsx, ods, csv, txt, odp, ppt, pptx, jpg, png, odt, doc, html, xml, idml, epub)
   - `GET /render/{renderId}` - Retrieve generated document (file stream)
 
+- **Template Listing**:
+  - `GET /templates` - List templates with optional filtering
+    - Paramètres:
+      - Query `id`: string - Filter by template ID
+      - Query `versionId`: string - Filter by version ID
+      - Query `category`: string - Filter by category
+      - Query `includeVersions`: boolean (défaut: false) - Include all versions for a specific template ID
+      - Query `search`: string - Search in template name (fuzzy search), version ID (exact), or template ID (exact)
+      - Query `limit`: number (défaut: 100) - Limit the number of items returned
+      - Query `cursor`: string - Cursor for pagination
+
 - **Paramètres globaux**:
-  - Header `carbone-version`: 4 ou 5 (défaut: 4)
+  - Header `carbone-version`: 4 ou 5 (défaut: 5)
 - **Authentification**: Bearer token via header `Authorization`
 - **Host**: api.carbone.io (HTTPS)
 
