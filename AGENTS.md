@@ -31,7 +31,7 @@
   - `DELETE /template/{templateId}` - Delete template
 
 - **Document Rendering**:
-  - `POST /render/{renderId}` - Generate document from template + JSON data
+  - `POST /render/{templateId}` - Generate document from template + JSON data
     - Paramètres:
       - Body `data`: JSON dataset requis pour le rendu
       - Body `convertTo`: Format de conversion (pdf, docx, xlsx, ods, csv, txt, odp, ppt, pptx, jpg, png, odt, doc, html, xml, idml, epub)
