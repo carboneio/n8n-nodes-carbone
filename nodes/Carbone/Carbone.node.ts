@@ -62,13 +62,15 @@ export class Carbone implements INodeType {
 		const returnData: INodeExecutionData[] = [];
 
 		// Fonctions utilitaires locales
-		const getCommonOptions = async (i: number): Promise<{
+		const getCommonOptions = async (
+			i: number,
+		): Promise<{
 			credentials: any;
 			carboneVersion: string;
 		}> => {
 			const credentials = (await this.getCredentials('carboneApi')) as any;
 			const additionalOptions = this.getNodeParameter('additionalOptions', i, {}) as any;
-			const carboneVersion = (additionalOptions.carboneVersion as string) || '4';
+			const carboneVersion = (additionalOptions.carboneVersion as string) || '5';
 
 			return { credentials, carboneVersion };
 		};
@@ -111,7 +113,7 @@ export class Carbone implements INodeType {
 							throw new NodeOperationError(
 								this.getNode(),
 								`Binary property '${binaryPropertyName}' not found`,
-								{ itemIndex: i }
+								{ itemIndex: i },
 							);
 						}
 
@@ -171,7 +173,7 @@ export class Carbone implements INodeType {
 					} else {
 						throw new NodeOperationError(
 							this.getNode(),
-							`L'opération ${operation} sur la ressource ${resource} n'est pas implémentée`
+							`L'opération ${operation} sur la ressource ${resource} n'est pas implémentée`,
 						);
 					}
 				} else if (resource === 'renderDocument') {
@@ -223,7 +225,9 @@ export class Carbone implements INodeType {
 						const contentDisposition = response.headers['content-disposition'] || '';
 						let fileName = 'document'; // fallback par défaut
 
-						const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+						const filenameMatch = contentDisposition.match(
+							/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
+						);
 						if (filenameMatch && filenameMatch[1]) {
 							fileName = filenameMatch[1].replace(/['"]/g, '');
 						}
@@ -245,13 +249,13 @@ export class Carbone implements INodeType {
 					} else {
 						throw new NodeOperationError(
 							this.getNode(),
-							`L'opération ${operation} sur la ressource ${resource} n'est pas implémentée`
+							`L'opération ${operation} sur la ressource ${resource} n'est pas implémentée`,
 						);
 					}
 				} else {
 					throw new NodeOperationError(
 						this.getNode(),
-						`La ressource ${resource} n'est pas implémentée`
+						`La ressource ${resource} n'est pas implémentée`,
 					);
 				}
 
@@ -260,7 +264,10 @@ export class Carbone implements INodeType {
 				if (error instanceof NodeOperationError) {
 					throw error;
 				}
-				throw new NodeOperationError(this.getNode(), `Erreur lors de l'exécution: ${error.message}`);
+				throw new NodeOperationError(
+					this.getNode(),
+					`Erreur lors de l'exécution: ${error.message}`,
+				);
 			}
 		}
 
