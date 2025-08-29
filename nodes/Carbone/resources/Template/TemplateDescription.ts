@@ -71,19 +71,6 @@ export const uploadOperation: INodeProperties[] = [
 		},
 		hint: 'Enter the name of the binary field that holds the template file (e.g. data, file, attachment_0, etc.)',
 	},
-	{
-		displayName: 'Enable Versioning',
-		name: 'versioning',
-		type: 'boolean',
-		default: true,
-		description: 'Whether to enable template versioning',
-		displayOptions: {
-			show: {
-				resource: ['template'],
-				operation: ['upload'],
-			},
-		},
-	},
 ];
 
 export const deleteOperation: INodeProperties[] = [
@@ -272,11 +259,19 @@ export const templateUploadAdditionalOptions: INodeProperties[] = [
 		},
 		options: [
 			{
-				displayName: 'Template Name',
-				name: 'name',
-				type: 'string',
+				displayName: 'Deployed At',
+				name: 'deployedAt',
+				type: 'dateTime',
 				default: '',
-				description: 'Name for the template',
+				description:
+					'When a report is generated using the new template ID, Carbone selects the template version with the highest deployedAt timestamp that is not in the future',
+			},
+			{
+				displayName: 'Enable Versioning',
+				name: 'versioning',
+				type: 'boolean',
+				default: true,
+				description: 'Whether to enable template versioning',
 			},
 			{
 				displayName: 'Template Comment',
@@ -286,12 +281,19 @@ export const templateUploadAdditionalOptions: INodeProperties[] = [
 				description: 'Comment for the template',
 			},
 			{
-				displayName: 'Deployed At',
-				name: 'deployedAt',
-				type: 'dateTime',
+				displayName: 'Template ID',
+				name: 'id',
+				type: 'string',
 				default: '',
-				description:
-					'When a report is generated using the new template ID, Carbone selects the template version with the highest deployedAt timestamp that is not in the future',
+				description: 'The unique identifier of the template to update',
+				hint: 'The unique identifier of the template to update',
+			},
+			{
+				displayName: 'Template Name',
+				name: 'name',
+				type: 'string',
+				default: '',
+				description: 'Name for the template',
 			},
 		],
 	},

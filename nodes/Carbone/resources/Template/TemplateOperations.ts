@@ -69,6 +69,7 @@ export class TemplateOperations {
 
 		// Get new parameters for template upload
 		const versioning = getNodeParameter('versioning', i, true) as boolean;
+		const id = getNodeParameter('id', i, '') as string;
 		const name = getNodeParameter('name', i, '') as string;
 		const comment = getNodeParameter('comment', i, '') as string;
 		const deployedAt = getNodeParameter('deployedAt', i, '') as string;
@@ -78,7 +79,7 @@ export class TemplateOperations {
 		const formData: any = {};
 
 		// Add versioning first as required by the API
-		formData.versioning = versioning ? "true" : "false";
+		formData.versioning = versioning ? 'true' : 'false';
 
 		// Add template file
 		formData.template = {
@@ -90,6 +91,9 @@ export class TemplateOperations {
 		};
 
 		// Add other parameters
+		if (id) {
+			formData.id = id;
+		}
 		if (name) {
 			formData.name = name;
 		}
