@@ -4,10 +4,18 @@
 - **Projet**: n8n-nodes-carbone - Un nœud personnalisé pour n8n permettant d'interagir avec l'API Carbone.io
 - **Objectif**: Gestion de templates et génération de documents (PDF, DOCX, XLS, etc.) via Carbone.io
 - **Architecture**: Package npm communautaire n8n avec structure TypeScript
-- **Composants principaux**: 
+- **Composants principaux** :
   - Node principal: `Carbone` dans `nodes/Carbone/`
   - Credentials: `CarboneApi` dans `credentials/`
-  - Description des opérations dans `CarboneDescription.ts`
+  - **Nouvelle structure modulaire** :
+    - `CarboneDescription.ts` - Point d'entrée pour les imports des descriptions
+    - **Ressources organisées par domaine** :
+      - `resources/Template/` - Gestion des templates (descriptions et opérations)
+        - `TemplateDescription.ts` - Définitions des opérations et champs pour les templates
+        - `TemplateOperations.ts` - Implémentation des opérations sur les templates
+      - `resources/RenderDocument/` - Gestion des documents générés (descriptions et opérations)
+        - `RenderDescription.ts` - Définitions des opérations et champs pour le rendu
+        - `RenderOperations.ts` - Implémentation des opérations de rendu
 
 ### Routes API Carbone.io complètes :
 - **Template Management**:
