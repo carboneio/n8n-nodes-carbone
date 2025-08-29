@@ -8,8 +8,6 @@ export class TemplateOperations {
 		getCredentials: any,
 	): Promise<INodeExecutionData> {
 		const credentials = (await getCredentials('carboneApi')) as any;
-		const additionalOptions = getNodeParameter('additionalOptions', i, {}) as any;
-		const carboneVersion = (additionalOptions.carboneVersion as string) || '5';
 
 		// Get all list parameters
 		const id = getNodeParameter('id', i, '') as string;
@@ -36,7 +34,7 @@ export class TemplateOperations {
 			url: `${credentials.apiUrl}/templates`,
 			headers: {
 				Authorization: `Bearer ${credentials.apiKey}`,
-				'carbone-version': carboneVersion,
+				'carbone-version': credentials.carboneVersion,
 			},
 			qs: qs,
 		});
@@ -53,8 +51,6 @@ export class TemplateOperations {
 	): Promise<INodeExecutionData> {
 		const binaryPropertyName = getNodeParameter('binaryPropertyName', i) as string;
 		const credentials = (await getCredentials('carboneApi')) as any;
-		const additionalOptions = getNodeParameter('additionalOptions', i, {}) as any;
-		const carboneVersion = (additionalOptions.carboneVersion as string) || '5';
 
 		// Valider les données binaires
 		helpers.assertBinaryData(i, binaryPropertyName);
@@ -110,7 +106,7 @@ export class TemplateOperations {
 			url: `${credentials.apiUrl}/template`,
 			headers: {
 				Authorization: `Bearer ${credentials.apiKey}`,
-				'carbone-version': carboneVersion,
+				'carbone-version': credentials.carboneVersion,
 			},
 			formData: formData,
 		});
@@ -126,15 +122,13 @@ export class TemplateOperations {
 	): Promise<INodeExecutionData> {
 		const templateId = getNodeParameter('templateId', i) as string;
 		const credentials = (await getCredentials('carboneApi')) as any;
-		const additionalOptions = getNodeParameter('additionalOptions', i, {}) as any;
-		const carboneVersion = (additionalOptions.carboneVersion as string) || '5';
 
 		const response = await helpers.request({
 			method: 'DELETE',
 			url: `${credentials.apiUrl}/template/${templateId}`,
 			headers: {
 				Authorization: `Bearer ${credentials.apiKey}`,
-				'carbone-version': carboneVersion,
+				'carbone-version': credentials.carboneVersion,
 			},
 		});
 

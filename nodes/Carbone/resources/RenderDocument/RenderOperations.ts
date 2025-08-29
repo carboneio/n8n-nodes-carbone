@@ -11,8 +11,6 @@ export class RenderOperations {
 		const data = getNodeParameter('data', i) as object;
 		const convertTo = getNodeParameter('convertTo', i, 'pdf') as string;
 		const credentials = (await getCredentials('carboneApi')) as any;
-		const additionalOptions = getNodeParameter('additionalOptions', i, {}) as any;
-		const carboneVersion = (additionalOptions.carboneVersion as string) || '5';
 
 		const requestBody: any = { data };
 
@@ -26,7 +24,7 @@ export class RenderOperations {
 			url: `${credentials.apiUrl}/render/${renderId}`,
 			headers: {
 				Authorization: `Bearer ${credentials.apiKey}`,
-				'carbone-version': carboneVersion,
+				'carbone-version': credentials.carboneVersion,
 				'Content-Type': 'application/json',
 			},
 			body: requestBody,
@@ -44,15 +42,13 @@ export class RenderOperations {
 	): Promise<INodeExecutionData> {
 		const renderId = getNodeParameter('renderId', i) as string;
 		const credentials = (await getCredentials('carboneApi')) as any;
-		const additionalOptions = getNodeParameter('additionalOptions', i, {}) as any;
-		const carboneVersion = (additionalOptions.carboneVersion as string) || '5';
 
 		const response = await helpers.request({
 			method: 'GET',
 			url: `${credentials.apiUrl}/render/${renderId}`,
 			headers: {
 				Authorization: `Bearer ${credentials.apiKey}`,
-				'carbone-version': carboneVersion,
+				'carbone-version': credentials.carboneVersion,
 			},
 			encoding: null, // Important pour obtenir les données binaires
 			resolveWithFullResponse: true,

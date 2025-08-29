@@ -1,4 +1,9 @@
-import { IAuthenticateGeneric, ICredentialType, INodeProperties } from 'n8n-workflow';
+import {
+	IAuthenticateGeneric,
+	ICredentialType,
+	INodeProperties,
+	ICredentialTestRequest,
+} from 'n8n-workflow';
 
 export class CarboneApi implements ICredentialType {
 	name = 'carboneApi';
@@ -24,22 +29,31 @@ export class CarboneApi implements ICredentialType {
 			description: 'The base URL for Carbone.io API (change this for self-hosted instances)',
 			placeholder: 'https://api.carbone.io',
 		},
+		{
+			displayName: 'Carbone API Version',
+			name: 'carboneVersion',
+			type: 'string',
+			default: '5',
+			description: 'The version of the Carbone API to use (4 or 5)',
+			placeholder: '5',
+		},
 	];
 
 	authenticate: IAuthenticateGeneric = {
 		type: 'generic',
 		properties: {
 			headers: {
-				Authorization: 'Bearer {{$credentials.apiKey}}',
+				Authorization: '=Bearer {{$credentials.apiKey}}',
+				'carbone-version': '={{$credentials.carboneVersion}}',
 			},
 		},
 	};
 
-	test = {
+	// The block below tells how this credential can be tested
+	test: ICredentialTestRequest = {
 		request: {
 			baseURL: '={{$credentials.apiUrl}}',
-			url: '/template',
-			headers: {},
+			url: '/templates',
 		},
 	};
 }

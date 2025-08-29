@@ -31,22 +31,7 @@ export const additionalOptions: INodeProperties[] = [
 		type: 'collection',
 		placeholder: 'Add Option',
 		default: {},
-		options: [
-			{
-				displayName: 'Carbone Version',
-				name: 'carboneVersion',
-				type: 'string',
-				default: '5',
-				description: 'Version of the Carbone API to use for this operation (e.g., 4, 5, 6, etc.)',
-				routing: {
-					request: {
-						headers: {
-							'carbone-version': '={{$value}}',
-						},
-					},
-				},
-			},
-		],
+		options: [],
 	},
 ];
 
