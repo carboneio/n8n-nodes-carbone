@@ -21,7 +21,7 @@ export const renderOperations: INodeProperties[] = [
 				routing: {
 					request: {
 						method: 'POST',
-						url: '/render/{{$parameter.renderId}}',
+						url: '/render/{{$parameter.templateId}}',
 					},
 				},
 			},
@@ -45,8 +45,8 @@ export const renderOperations: INodeProperties[] = [
 // Render Document Fields
 export const generateOperation: INodeProperties[] = [
 	{
-		displayName: 'Render ID',
-		name: 'renderId',
+		displayName: 'Template ID',
+		name: 'templateId',
 		type: 'string',
 		required: true,
 		default: '',
@@ -140,6 +140,106 @@ export const getDocumentOperation: INodeProperties[] = [
 	},
 ];
 
-export const renderFields: INodeProperties[] = [...generateOperation, ...getDocumentOperation];
+// Additional Options for Document Generation
+export const generateAdditionalOptions: INodeProperties[] = [
+	{
+		displayName: 'Document Generation Additional Options',
+		name: 'generateAdditionalOptions',
+		type: 'collection',
+		placeholder: 'Add Option',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['renderDocument'],
+				operation: ['generate'],
+			},
+		},
+		options: [
+			{
+				displayName: 'Complement',
+				name: 'complement',
+				type: 'json',
+				default: '{}',
+				description: 'Additional data to complement the main dataset',
+			},
+			{
+				displayName: 'Currency Rates',
+				name: 'currencyRates',
+				type: 'json',
+				default: '{}',
+				description: 'Currency conversion rates',
+			},
+			{
+				displayName: 'Currency Source',
+				name: 'currencySource',
+				type: 'string',
+				default: '',
+				description: 'The source currency for conversion',
+			},
+			{
+				displayName: 'Currency Target',
+				name: 'currencyTarget',
+				type: 'string',
+				default: '',
+				description: 'The target currency for conversion',
+			},
+			{
+				displayName: 'Enum',
+				name: 'enum',
+				type: 'json',
+				default: '{}',
+				description: 'Enumeration values for the template',
+			},
+			{
+				displayName: 'Hard Refresh',
+				name: 'hardRefresh',
+				type: 'boolean',
+				default: true,
+				description: 'Whether to force a hard refresh of the template',
+			},
+			{
+				displayName: 'Language',
+				name: 'lang',
+				type: 'string',
+				default: 'fr',
+				description: 'The language to use for localization',
+			},
+			{
+				displayName: 'Report Name',
+				name: 'reportName',
+				type: 'string',
+				default: 'document',
+				description: 'The name of the generated report',
+			},
+			{
+				displayName: 'Timezone',
+				name: 'timezone',
+				type: 'string',
+				default: 'Europe/Paris',
+				description: 'The timezone to use for date formatting',
+			},
+			{
+				displayName: 'Translations',
+				name: 'translations',
+				type: 'json',
+				default: '{}',
+				description: 'Translation mappings for the template',
+			},
+			{
+				displayName: 'Variable String',
+				name: 'variableStr',
+				type: 'string',
+				default: '',
+				description: 'A string containing variables to be processed',
+			},
+		],
+	},
+];
+
+export const renderFields: INodeProperties[] = [
+	...generateOperation,
+	...generateAdditionalOptions,
+	...getDocumentOperation,
+];
 
 // No need to re-export, they're already exported

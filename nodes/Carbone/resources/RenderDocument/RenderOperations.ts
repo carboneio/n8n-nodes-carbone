@@ -7,9 +7,11 @@ export class RenderOperations {
 		getNodeParameter: any,
 		getCredentials: any,
 	): Promise<INodeExecutionData> {
-		const renderId = getNodeParameter('renderId', i) as string;
+		const templateId = getNodeParameter('templateId', i) as string;
 		const data = getNodeParameter('data', i) as object;
 		const convertTo = getNodeParameter('convertTo', i, 'pdf') as string;
+		const additionalOptions = getNodeParameter('generateAdditionalOptions', i, {}) as any;
+
 		const credentials = (await getCredentials('carboneApi')) as any;
 
 		const requestBody: any = { data };
@@ -19,9 +21,27 @@ export class RenderOperations {
 			requestBody.convertTo = convertTo;
 		}
 
+		// Ajouter les options supplémentaires
+		if (additionalOptions) {
+			if (additionalOptions.timezone) requestBody.timezone = additionalOptions.timezone;
+			if (additionalOptions.lang) requestBody.lang = additionalOptions.lang;
+			if (additionalOptions.complement) requestBody.complement = additionalOptions.complement;
+			if (additionalOptions.variableStr) requestBody.variableStr = additionalOptions.variableStr;
+			if (additionalOptions.reportName) requestBody.reportName = additionalOptions.reportName;
+			if (additionalOptions.enum) requestBody.enum = additionalOptions.enum;
+			if (additionalOptions.translations) requestBody.translations = additionalOptions.translations;
+			if (additionalOptions.currencySource)
+				requestBody.currencySource = additionalOptions.currencySource;
+			if (additionalOptions.currencyTarget)
+				requestBody.currencyTarget = additionalOptions.currencyTarget;
+			if (additionalOptions.currencyRates)
+				requestBody.currencyRates = additionalOptions.currencyRates;
+			if (additionalOptions.hardRefresh) requestBody.hardRefresh = additionalOptions.hardRefresh;
+		}
+
 		const response = await helpers.request({
 			method: 'POST',
-			url: `${credentials.apiUrl}/render/${renderId}`,
+			url: `${credentials.apiUrl}/render/${templateId}`,
 			headers: {
 				Authorization: `Bearer ${credentials.apiKey}`,
 				'carbone-version': credentials.carboneVersion,
@@ -58,9 +78,7 @@ export class RenderOperations {
 		const contentDisposition = response.headers['content-disposition'] || '';
 		let fileName = 'document'; // fallback par défaut
 
-		const filenameMatch = contentDisposition.match(
-			/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
-		);
+		const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
 		if (filenameMatch && filenameMatch[1]) {
 			fileName = filenameMatch[1].replace(/['"]/g, '');
 		}
