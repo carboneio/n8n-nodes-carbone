@@ -1,6 +1,10 @@
 import { INodeExecutionData } from 'n8n-workflow';
 
 export class TemplateOperations {
+	private convertIsoToUnixTimestamp(isoString: string): string {
+		return Math.floor(new Date(isoString).getTime() / 1000).toString();
+	}
+
 	async listTemplates(
 		i: number,
 		helpers: any,
@@ -101,7 +105,15 @@ export class TemplateOperations {
 			formData.comment = comment;
 		}
 		if (deployedAt) {
-			formData.deployedAt = deployedAt;
+			// Convert ISO string to Unix timestamp if needed
+			if (
+				typeof deployedAt === 'string' &&
+				/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(deployedAt)
+			) {
+				formData.deployedAt = this.convertIsoToUnixTimestamp(deployedAt);
+			} else {
+				formData.deployedAt = deployedAt;
+			}
 		}
 
 		// Faire la requête d'upload
