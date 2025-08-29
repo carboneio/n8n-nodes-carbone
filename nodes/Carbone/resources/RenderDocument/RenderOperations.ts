@@ -39,19 +39,51 @@ export class RenderOperations {
 			if (additionalOptions.hardRefresh) requestBody.hardRefresh = additionalOptions.hardRefresh;
 		}
 
+		let url = `${credentials.apiUrl}/render/${templateId}`;
+		if (additionalOptions.download) {
+			url += '?download=true';
+		}
+
 		const response = await helpers.request({
 			method: 'POST',
-			url: `${credentials.apiUrl}/render/${templateId}`,
+			url,
 			headers: {
 				Authorization: `Bearer ${credentials.apiKey}`,
 				'carbone-version': credentials.carboneVersion,
 				'Content-Type': 'application/json',
 			},
 			body: requestBody,
-			json: true,
+			json: !additionalOptions.download,
+			encoding: additionalOptions.download ? null : undefined,
+			resolveWithFullResponse: additionalOptions.download,
 		});
 
-		return { json: this.parseResponse(response) };
+		if (additionalOptions.download) {
+			// Extraire le nom du fichier depuis Content-Disposition
+			const contentDisposition = response.headers['content-disposition'] || '';
+			let fileName = 'document'; // fallback par défaut
+
+			const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+			if (filenameMatch && filenameMatch[1]) {
+				fileName = filenameMatch[1].replace(/['"]/g, '');
+			}
+
+			// Laisser n8n gérer le content-type automatiquement
+			const binaryData = {
+				[fileName]: await helpers.prepareBinaryData(response.body, fileName),
+			};
+
+			return {
+				json: {
+					success: true,
+					fileName,
+					size: response.body.length,
+				},
+				binary: binaryData,
+			};
+		} else {
+			return { json: this.parseResponse(response) };
+		}
 	}
 
 	async getDocument(

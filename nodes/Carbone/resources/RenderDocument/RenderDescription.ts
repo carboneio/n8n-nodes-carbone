@@ -184,6 +184,14 @@ export const generateAdditionalOptions: INodeProperties[] = [
 				description: 'The target currency for conversion',
 			},
 			{
+				displayName: 'Download',
+				name: 'download',
+				type: 'boolean',
+				default: false,
+				description:
+					'Whether to download the rendered report directly without storing it on the server',
+			},
+			{
 				displayName: 'Enum',
 				name: 'enum',
 				type: 'json',
