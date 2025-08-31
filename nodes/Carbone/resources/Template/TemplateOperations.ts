@@ -5,6 +5,13 @@ export class TemplateOperations {
 		return Math.floor(new Date(isoString).getTime() / 1000).toString();
 	}
 
+	private convertUnixTimestampToIso(timestamp: number): string | null {
+		if (timestamp === 0) {
+			return null;
+		}
+		return new Date(timestamp * 1000).toISOString();
+	}
+
 	async listTemplates(
 		i: number,
 		helpers: any,
@@ -184,12 +191,26 @@ export class TemplateOperations {
 		// Parser la réponse JSON si c'est une chaîne pour éviter le double encodage
 		if (typeof response === 'string') {
 			try {
-				return JSON.parse(response);
+				response = JSON.parse(response);
 			} catch (error) {
 				// Si le parsing échoue, utiliser la réponse originale
 				return response;
 			}
 		}
+
+		// Si la réponse contient un tableau de données, convertir les timestamps en dates ISO
+		if (response && response.data && Array.isArray(response.data)) {
+			response.data = response.data.map((item: any) => {
+				if (item.deployedAt !== undefined) {
+					item.deployedAt = this.convertUnixTimestampToIso(item.deployedAt);
+				}
+				if (item.createdAt !== undefined) {
+					item.createdAt = this.convertUnixTimestampToIso(item.createdAt);
+				}
+				return item;
+			});
+		}
+
 		return response;
 	}
 }
