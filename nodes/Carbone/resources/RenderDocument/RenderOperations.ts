@@ -79,9 +79,19 @@ export class RenderOperations {
 					size: response.body.length,
 				},
 				binary: binaryData,
+				pairedItem: {
+					item: i,
+					input: 0,
+				},
 			};
 		} else {
-			return { json: this.parseResponse(response) };
+			return {
+				json: this.parseResponse(response),
+				pairedItem: {
+					item: i,
+					input: 0,
+				},
+			};
 		}
 	}
 
@@ -127,6 +137,10 @@ export class RenderOperations {
 				size: response.body.length,
 			},
 			binary: binaryData,
+			pairedItem: {
+				item: i,
+				input: 0,
+			},
 		};
 	}
 

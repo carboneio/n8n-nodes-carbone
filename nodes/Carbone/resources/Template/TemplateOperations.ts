@@ -43,7 +43,13 @@ export class TemplateOperations {
 			qs: qs,
 		});
 
-		return { json: this.parseResponse(response) };
+		return {
+			json: this.parseResponse(response),
+			pairedItem: {
+				item: i,
+				input: 0,
+			},
+		};
 	}
 
 	async uploadTemplate(
@@ -71,19 +77,33 @@ export class TemplateOperations {
 		const fileBuffer = await helpers.getBinaryDataBuffer(i, binaryPropertyName);
 		const fileName = binaryProperty.fileName || 'template';
 
-		// Get new parameters for template upload
-		const versioning = getNodeParameter('versioning', i, true) as boolean;
-		const id = getNodeParameter('id', i, '') as string;
-		const name = getNodeParameter('name', i, '') as string;
-		const comment = getNodeParameter('comment', i, '') as string;
-		const deployedAt = getNodeParameter('deployedAt', i, '') as string;
+		// Get additional options for template upload
+		const templateUploadAdditionalOptions = getNodeParameter(
+			'templateUploadAdditionalOptions',
+			i,
+			{},
+		) as any;
+		const versioning =
+			templateUploadAdditionalOptions.versioning !== undefined
+				? templateUploadAdditionalOptions.versioning
+				: true;
+		const id = templateUploadAdditionalOptions.id || '';
+		const name = templateUploadAdditionalOptions.name || '';
+		const comment = templateUploadAdditionalOptions.comment || '';
+		const deployedAt = templateUploadAdditionalOptions.deployedAt || '';
 
 		// Préparer le formulaire multipart
 		// The 'versioning' field must be sent before the 'template' file field
+		// The 'id' field must be sent before the 'template' file field if provided
 		const formData: any = {};
 
 		// Add versioning first as required by the API
 		formData.versioning = versioning ? 'true' : 'false';
+
+		// Add id if not empty (must be sent before the template field)
+		if (id) {
+			formData.id = id;
+		}
 
 		// Add template file
 		formData.template = {
@@ -94,10 +114,7 @@ export class TemplateOperations {
 			},
 		};
 
-		// Add other parameters
-		if (id) {
-			formData.id = id;
-		}
+		// Add other optional parameters (only if not empty)
 		if (name) {
 			formData.name = name;
 		}
@@ -127,7 +144,13 @@ export class TemplateOperations {
 			formData: formData,
 		});
 
-		return { json: this.parseResponse(response) };
+		return {
+			json: this.parseResponse(response),
+			pairedItem: {
+				item: i,
+				input: 0,
+			},
+		};
 	}
 
 	async deleteTemplate(
@@ -148,7 +171,13 @@ export class TemplateOperations {
 			},
 		});
 
-		return { json: this.parseResponse(response) };
+		return {
+			json: this.parseResponse(response),
+			pairedItem: {
+				item: i,
+				input: 0,
+			},
+		};
 	}
 
 	private parseResponse(response: any): any {
