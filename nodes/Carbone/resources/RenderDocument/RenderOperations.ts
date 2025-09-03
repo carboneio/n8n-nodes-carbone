@@ -112,7 +112,7 @@ export class RenderOperations {
 				};
 			}
 		} catch (error) {
-			throw CarboneErrorHandler.handleApiError(error, 'generate document', i);
+			throw CarboneErrorHandler.handleApiError(error, { name: 'Carbone' } as any);
 		}
 	}
 
@@ -165,7 +165,7 @@ export class RenderOperations {
 				},
 			};
 		} catch (error) {
-			throw CarboneErrorHandler.handleApiError(error, 'get document', i);
+			throw CarboneErrorHandler.handleApiError(error, { name: 'Carbone' } as any);
 		}
 	}
 

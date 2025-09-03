@@ -60,7 +60,7 @@ export class TemplateOperations {
 				},
 			};
 		} catch (error) {
-			throw CarboneErrorHandler.handleApiError(error, 'list templates', i);
+			throw CarboneErrorHandler.handleApiError(error, { name: 'Carbone' } as any);
 		}
 	}
 
@@ -171,7 +171,7 @@ export class TemplateOperations {
 				},
 			};
 		} catch (error) {
-			throw CarboneErrorHandler.handleApiError(error, 'upload template', i);
+			throw CarboneErrorHandler.handleApiError(error, { name: 'Carbone' } as any);
 		}
 	}
 
@@ -202,7 +202,7 @@ export class TemplateOperations {
 				},
 			};
 		} catch (error) {
-			throw CarboneErrorHandler.handleApiError(error, 'delete template', i);
+			throw CarboneErrorHandler.handleApiError(error, { name: 'Carbone' } as any);
 		}
 	}
 
