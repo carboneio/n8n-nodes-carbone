@@ -1,4 +1,4 @@
-import { INodeExecutionData } from 'n8n-workflow';
+import { INodeExecutionData, NodeApiError, NodeOperationError } from 'n8n-workflow';
 
 export class TemplateOperations {
 	private convertIsoToUnixTimestamp(isoString: string): string {
@@ -39,24 +39,28 @@ export class TemplateOperations {
 		if (limit) qs.limit = limit;
 		if (cursor) qs.cursor = cursor;
 
-		// Make the request to list templates
-		const response = await helpers.request({
-			method: 'GET',
-			url: `${credentials.apiUrl}/templates`,
-			headers: {
-				Authorization: `Bearer ${credentials.apiKey}`,
-				'carbone-version': credentials.carboneVersion,
-			},
-			qs: qs,
-		});
+		try {
+			// Make the request to list templates
+			const response = await helpers.request({
+				method: 'GET',
+				url: `${credentials.apiUrl}/templates`,
+				headers: {
+					Authorization: `Bearer ${credentials.apiKey}`,
+					'carbone-version': credentials.carboneVersion,
+				},
+				qs: qs,
+			});
 
-		return {
-			json: this.parseResponse(response),
-			pairedItem: {
-				item: i,
-				input: 0,
-			},
-		};
+			return {
+				json: this.parseResponse(response),
+				pairedItem: {
+					item: i,
+					input: 0,
+				},
+			};
+		} catch (error) {
+			throw this.handleApiError(error, 'list templates', i);
+		}
 	}
 
 	async uploadTemplate(
@@ -77,8 +81,14 @@ export class TemplateOperations {
 		const binaryProperty = binaryData[binaryPropertyName];
 
 		if (!binaryProperty) {
-			// Let the caller handle the error
-			throw new Error(`Binary property '${binaryPropertyName}' not found`);
+			throw new NodeOperationError(
+				{ name: 'Carbone' } as any,
+				`Binary property '${binaryPropertyName}' not found`,
+				{
+					description: 'Please ensure the binary data is properly configured in the previous node',
+					itemIndex: i,
+				},
+			);
 		}
 
 		const fileBuffer = await helpers.getBinaryDataBuffer(i, binaryPropertyName);
@@ -140,24 +150,28 @@ export class TemplateOperations {
 			}
 		}
 
-		// Faire la requête d'upload
-		const response = await helpers.request({
-			method: 'POST',
-			url: `${credentials.apiUrl}/template`,
-			headers: {
-				Authorization: `Bearer ${credentials.apiKey}`,
-				'carbone-version': credentials.carboneVersion,
-			},
-			formData: formData,
-		});
+		try {
+			// Faire la requête d'upload
+			const response = await helpers.request({
+				method: 'POST',
+				url: `${credentials.apiUrl}/template`,
+				headers: {
+					Authorization: `Bearer ${credentials.apiKey}`,
+					'carbone-version': credentials.carboneVersion,
+				},
+				formData: formData,
+			});
 
-		return {
-			json: this.parseResponse(response),
-			pairedItem: {
-				item: i,
-				input: 0,
-			},
-		};
+			return {
+				json: this.parseResponse(response),
+				pairedItem: {
+					item: i,
+					input: 0,
+				},
+			};
+		} catch (error) {
+			throw this.handleApiError(error, 'upload template', i);
+		}
 	}
 
 	async deleteTemplate(
@@ -169,22 +183,63 @@ export class TemplateOperations {
 		const templateId = getNodeParameter('templateId', i) as string;
 		const credentials = (await getCredentials('carboneApi')) as any;
 
-		const response = await helpers.request({
-			method: 'DELETE',
-			url: `${credentials.apiUrl}/template/${templateId}`,
-			headers: {
-				Authorization: `Bearer ${credentials.apiKey}`,
-				'carbone-version': credentials.carboneVersion,
-			},
-		});
+		try {
+			const response = await helpers.request({
+				method: 'DELETE',
+				url: `${credentials.apiUrl}/template/${templateId}`,
+				headers: {
+					Authorization: `Bearer ${credentials.apiKey}`,
+					'carbone-version': credentials.carboneVersion,
+				},
+			});
 
-		return {
-			json: this.parseResponse(response),
-			pairedItem: {
-				item: i,
-				input: 0,
-			},
-		};
+			return {
+				json: this.parseResponse(response),
+				pairedItem: {
+					item: i,
+					input: 0,
+				},
+			};
+		} catch (error) {
+			throw this.handleApiError(error, 'delete template', i);
+		}
+	}
+
+	private handleApiError(error: any, operation: string, itemIndex: number): NodeApiError {
+		// Handle specific HTTP status codes with custom messages
+		if (error.httpCode === '401') {
+			return new NodeApiError({ name: 'Carbone' } as any, error, {
+				message: 'Authentication failed',
+				description: 'Please check your Carbone API credentials and try again.',
+			});
+		}
+
+		if (error.httpCode === '404') {
+			return new NodeApiError({ name: 'Carbone' } as any, error, {
+				message: 'Resource not found',
+				description: `The requested resource could not be found while trying to ${operation}. Please check your parameters.`,
+			});
+		}
+
+		if (error.httpCode === '429') {
+			return new NodeApiError({ name: 'Carbone' } as any, error, {
+				message: 'Rate limit exceeded',
+				description: 'Too many requests to Carbone API. Please wait and try again later.',
+			});
+		}
+
+		if (error.httpCode && error.httpCode >= '500') {
+			return new NodeApiError({ name: 'Carbone' } as any, error, {
+				message: 'Carbone server error',
+				description: `The Carbone API encountered a server error while trying to ${operation}. Please try again later.`,
+			});
+		}
+
+		// Generic API error
+		return new NodeApiError({ name: 'Carbone' } as any, error, {
+			message: `API error while trying to ${operation}`,
+			description: error.message || 'An unexpected error occurred with the Carbone API.',
+		});
 	}
 
 	private parseResponse(response: any): any {

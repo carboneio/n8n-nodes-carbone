@@ -5,6 +5,7 @@ import {
 	INodeTypeDescription,
 	NodeConnectionType,
 	NodeOperationError,
+	NodeApiError,
 } from 'n8n-workflow';
 import {
 	resource,
@@ -140,19 +141,42 @@ export class Carbone implements INodeType {
 
 				returnData.push(result);
 			} catch (error) {
-				if (error instanceof NodeOperationError) {
+				// Handle continueOnFail mode
+				if (this.continueOnFail()) {
+					returnData.push({
+						json: {
+							error: error instanceof Error ? error.message : String(error),
+						},
+						pairedItem: {
+							item: i,
+							input: 0,
+						},
+					});
+					continue;
+				}
+
+				// Re-throw already properly formatted errors
+				if (error instanceof NodeOperationError || error instanceof NodeApiError) {
 					throw error;
 				}
-				if (error instanceof Error) {
+
+				// Handle different types of errors appropriately
+				if (error && typeof error === 'object' && 'httpCode' in error) {
+					// This is an API error
+					throw new NodeApiError(this.getNode(), error as any, {
+						message: 'API Error',
+						description: error.message || 'An unexpected error occurred with the Carbone API.',
+					});
+				} else {
+					// This is an operational error
 					throw new NodeOperationError(
 						this.getNode(),
-						`Erreur lors de l'exécution: ${error.message}`,
+						error instanceof Error ? error.message : String(error),
+						{
+							itemIndex: i,
+						},
 					);
 				}
-				throw new NodeOperationError(
-					this.getNode(),
-					`Erreur lors de l'exécution: ${String(error)}`,
-				);
 			}
 		}
 

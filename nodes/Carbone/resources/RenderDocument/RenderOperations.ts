@@ -1,4 +1,4 @@
-import { INodeExecutionData } from 'n8n-workflow';
+import { INodeExecutionData, NodeApiError, NodeOperationError } from 'n8n-workflow';
 
 export class RenderOperations {
 	async generateDocument(
@@ -20,7 +20,14 @@ export class RenderOperations {
 			try {
 				data = JSON.parse(data);
 			} catch (error) {
-				throw new Error(`Invalid JSON data: ${error.message}`);
+				throw new NodeOperationError(
+					{ name: 'Carbone' } as any,
+					`Invalid JSON data: ${error.message}`,
+					{
+						description: 'The data parameter must be valid JSON. Please check your JSON syntax.',
+						itemIndex: i,
+					},
+				);
 			}
 		}
 
@@ -49,24 +56,86 @@ export class RenderOperations {
 			if (additionalOptions.hardRefresh) requestBody.hardRefresh = additionalOptions.hardRefresh;
 		}
 
-		const response = await helpers.request({
-			method: 'POST',
-			url: `${credentials.apiUrl}/render/${templateId}`,
-			qs: {
-				download: download ? 'true' : undefined,
-			},
-			headers: {
-				Authorization: `Bearer ${credentials.apiKey}`,
-				'carbone-version': credentials.carboneVersion,
-				'Content-Type': 'application/json',
-			},
-			body: requestBody,
-			json: !download,
-			encoding: download ? null : undefined,
-			resolveWithFullResponse: download,
-		});
+		try {
+			const response = await helpers.request({
+				method: 'POST',
+				url: `${credentials.apiUrl}/render/${templateId}`,
+				qs: {
+					download: download ? 'true' : undefined,
+				},
+				headers: {
+					Authorization: `Bearer ${credentials.apiKey}`,
+					'carbone-version': credentials.carboneVersion,
+					'Content-Type': 'application/json',
+				},
+				body: requestBody,
+				json: !download,
+				encoding: download ? null : undefined,
+				resolveWithFullResponse: download,
+			});
 
-		if (download) {
+			if (download) {
+				// Extraire le nom du fichier depuis Content-Disposition
+				const contentDisposition = response.headers['content-disposition'] || '';
+				let fileName = 'document'; // fallback par défaut
+
+				const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+				if (filenameMatch && filenameMatch[1]) {
+					fileName = filenameMatch[1].replace(/['"]/g, '');
+				}
+
+				// Laisser n8n gérer le content-type automatiquement
+				const binaryData = {
+					[fileName]: await helpers.prepareBinaryData(response.body, fileName),
+				};
+
+				return {
+					json: {
+						success: true,
+						fileName,
+						size: response.body.length,
+					},
+					binary: binaryData,
+					pairedItem: {
+						item: i,
+						input: 0,
+					},
+				};
+			} else {
+				return {
+					json: this.parseResponse(response),
+					pairedItem: {
+						item: i,
+						input: 0,
+					},
+				};
+			}
+		} catch (error) {
+			throw this.handleApiError(error, 'generate document', i);
+		}
+	}
+
+	async getDocument(
+		i: number,
+		helpers: any,
+		getNodeParameter: any,
+		getCredentials: any,
+	): Promise<INodeExecutionData> {
+		const renderId = getNodeParameter('renderId', i) as string;
+		const credentials = (await getCredentials('carboneApi')) as any;
+
+		try {
+			const response = await helpers.request({
+				method: 'GET',
+				url: `${credentials.apiUrl}/render/${renderId}`,
+				headers: {
+					Authorization: `Bearer ${credentials.apiKey}`,
+					'carbone-version': credentials.carboneVersion,
+				},
+				encoding: null, // Important pour obtenir les données binaires
+				resolveWithFullResponse: true,
+			});
+
 			// Extraire le nom du fichier depuis Content-Disposition
 			const contentDisposition = response.headers['content-disposition'] || '';
 			let fileName = 'document'; // fallback par défaut
@@ -84,6 +153,7 @@ export class RenderOperations {
 			return {
 				json: {
 					success: true,
+					renderId,
 					fileName,
 					size: response.body.length,
 				},
@@ -93,64 +163,46 @@ export class RenderOperations {
 					input: 0,
 				},
 			};
-		} else {
-			return {
-				json: this.parseResponse(response),
-				pairedItem: {
-					item: i,
-					input: 0,
-				},
-			};
+		} catch (error) {
+			throw this.handleApiError(error, 'get document', i);
 		}
 	}
 
-	async getDocument(
-		i: number,
-		helpers: any,
-		getNodeParameter: any,
-		getCredentials: any,
-	): Promise<INodeExecutionData> {
-		const renderId = getNodeParameter('renderId', i) as string;
-		const credentials = (await getCredentials('carboneApi')) as any;
-
-		const response = await helpers.request({
-			method: 'GET',
-			url: `${credentials.apiUrl}/render/${renderId}`,
-			headers: {
-				Authorization: `Bearer ${credentials.apiKey}`,
-				'carbone-version': credentials.carboneVersion,
-			},
-			encoding: null, // Important pour obtenir les données binaires
-			resolveWithFullResponse: true,
-		});
-
-		// Extraire le nom du fichier depuis Content-Disposition
-		const contentDisposition = response.headers['content-disposition'] || '';
-		let fileName = 'document'; // fallback par défaut
-
-		const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
-		if (filenameMatch && filenameMatch[1]) {
-			fileName = filenameMatch[1].replace(/['"]/g, '');
+	private handleApiError(error: any, operation: string, itemIndex: number): NodeApiError {
+		// Handle specific HTTP status codes with custom messages
+		if (error.httpCode === '401') {
+			return new NodeApiError({ name: 'Carbone' } as any, error, {
+				message: 'Authentication failed',
+				description: 'Please check your Carbone API credentials and try again.',
+			});
 		}
 
-		// Laisser n8n gérer le content-type automatiquement
-		const binaryData = {
-			[fileName]: await helpers.prepareBinaryData(response.body, fileName),
-		};
+		if (error.httpCode === '404') {
+			return new NodeApiError({ name: 'Carbone' } as any, error, {
+				message: 'Resource not found',
+				description: `The requested resource could not be found while trying to ${operation}. Please check your parameters.`,
+			});
+		}
 
-		return {
-			json: {
-				success: true,
-				renderId,
-				fileName,
-				size: response.body.length,
-			},
-			binary: binaryData,
-			pairedItem: {
-				item: i,
-				input: 0,
-			},
-		};
+		if (error.httpCode === '429') {
+			return new NodeApiError({ name: 'Carbone' } as any, error, {
+				message: 'Rate limit exceeded',
+				description: 'Too many requests to Carbone API. Please wait and try again later.',
+			});
+		}
+
+		if (error.httpCode && error.httpCode >= '500') {
+			return new NodeApiError({ name: 'Carbone' } as any, error, {
+				message: 'Carbone server error',
+				description: `The Carbone API encountered a server error while trying to ${operation}. Please try again later.`,
+			});
+		}
+
+		// Generic API error
+		return new NodeApiError({ name: 'Carbone' } as any, error, {
+			message: `API error while trying to ${operation}`,
+			description: error.message || 'An unexpected error occurred with the Carbone API.',
+		});
 	}
 
 	private parseResponse(response: any): any {
