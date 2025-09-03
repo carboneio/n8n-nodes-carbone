@@ -8,17 +8,26 @@ export class RenderOperations {
 		getCredentials: any,
 	): Promise<INodeExecutionData> {
 		const templateId = getNodeParameter('templateId', i) as string;
-		const data = getNodeParameter('data', i) as object;
+		let data = getNodeParameter('data', i);
 		const convertTo = getNodeParameter('convertTo', i, 'pdf') as string;
 		const download = getNodeParameter('download', i, false) as boolean;
 		const additionalOptions = getNodeParameter('generateAdditionalOptions', i, {}) as any;
 
 		const credentials = (await getCredentials('carboneApi')) as any;
 
+		// Gérer le parsing JSON pour les deux formats: string et objet
+		if (typeof data === 'string') {
+			try {
+				data = JSON.parse(data);
+			} catch (error) {
+				throw new Error(`Invalid JSON data: ${error.message}`);
+			}
+		}
+
 		const requestBody: any = { data };
 
 		// Ajouter convertTo si spécifié
-		if (convertTo && convertTo !== 'pdf') {
+		if (convertTo) {
 			requestBody.convertTo = convertTo;
 		}
 
