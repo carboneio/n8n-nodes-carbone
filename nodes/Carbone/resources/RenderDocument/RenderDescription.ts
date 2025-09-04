@@ -18,24 +18,12 @@ export const renderOperations: INodeProperties[] = [
 				value: 'generate',
 				action: 'Generate document',
 				description: 'Generate a document from a template and JSON data',
-				routing: {
-					request: {
-						method: 'POST',
-						url: '/render/{{$parameter.templateId}}',
-					},
-				},
 			},
 			{
 				name: 'Get Document',
 				value: 'get',
 				action: 'Get generated document',
 				description: 'Get a generated document from render ID',
-				routing: {
-					request: {
-						method: 'GET',
-						url: '/render/{{$parameter.renderId}}',
-					},
-				},
 			},
 		],
 		default: 'generate',
@@ -44,6 +32,31 @@ export const renderOperations: INodeProperties[] = [
 
 // Render Document Fields
 export const generateOperation: INodeProperties[] = [
+	{
+		displayName: 'Template Source',
+		name: 'templateSource',
+		type: 'options',
+		default: 'id',
+		description: 'How to provide the template for document generation',
+		displayOptions: {
+			show: {
+				resource: ['renderDocument'],
+				operation: ['generate'],
+			},
+		},
+		options: [
+			{
+				name: 'Template ID',
+				value: 'id',
+				description: 'Use a template ID from Carbone',
+			},
+			{
+				name: 'Template File (Base64)',
+				value: 'base64',
+				description: 'Provide the template file as base64 string',
+			},
+		],
+	},
 	{
 		displayName: 'Template ID',
 		name: 'templateId',
@@ -55,6 +68,22 @@ export const generateOperation: INodeProperties[] = [
 			show: {
 				resource: ['renderDocument'],
 				operation: ['generate'],
+				templateSource: ['id'],
+			},
+		},
+	},
+	{
+		displayName: 'Template File (Base64)',
+		name: 'templateBase64',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'The template file encoded as base64 string',
+		displayOptions: {
+			show: {
+				resource: ['renderDocument'],
+				operation: ['generate'],
+				templateSource: ['base64'],
 			},
 		},
 	},
@@ -69,13 +98,6 @@ export const generateOperation: INodeProperties[] = [
 			show: {
 				resource: ['renderDocument'],
 				operation: ['generate'],
-			},
-		},
-		routing: {
-			request: {
-				body: {
-					data: '={{$value}}',
-				},
 			},
 		},
 	},
@@ -113,13 +135,6 @@ export const generateOperation: INodeProperties[] = [
 				value: 'xlsx',
 			},
 		],
-		routing: {
-			request: {
-				body: {
-					convertTo: '={{$value}}',
-				},
-			},
-		},
 	},
 	{
 		displayName: 'Download Rendered Document',
@@ -133,13 +148,6 @@ export const generateOperation: INodeProperties[] = [
 			show: {
 				resource: ['renderDocument'],
 				operation: ['generate'],
-			},
-		},
-		routing: {
-			request: {
-				qs: {
-					download: '={{$value}}',
-				},
 			},
 		},
 	},

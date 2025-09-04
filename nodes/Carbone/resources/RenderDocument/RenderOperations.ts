@@ -8,7 +8,15 @@ export class RenderOperations {
 		getNodeParameter: any,
 		getCredentials: any,
 	): Promise<INodeExecutionData> {
-		const templateId = getNodeParameter('templateId', i) as string;
+		const templateSource = getNodeParameter('templateSource', i) as string;
+		let templateId: string | undefined;
+		let templateBase64: string | undefined;
+
+		if (templateSource === 'id') {
+			templateId = getNodeParameter('templateId', i) as string;
+		} else {
+			templateBase64 = getNodeParameter('templateBase64', i) as string;
+		}
 		let data = getNodeParameter('data', i);
 		const convertTo = getNodeParameter('convertTo', i, 'pdf') as string;
 		const download = getNodeParameter('download', i, false) as boolean;
@@ -57,10 +65,21 @@ export class RenderOperations {
 			if (additionalOptions.hardRefresh) requestBody.hardRefresh = additionalOptions.hardRefresh;
 		}
 
+		// Construire l'URL en fonction de la source du template
+		let apiUrl: string;
+		if (templateSource === 'base64') {
+			// Ajouter le template base64 au corps de la requête
+			requestBody.template = templateBase64;
+			apiUrl = `${credentials.apiUrl}/render/template`;
+		} else {
+			// Utiliser le template ID dans l'URL
+			apiUrl = `${credentials.apiUrl}/render/${templateId}`;
+		}
+
 		try {
 			const response = await helpers.request({
 				method: 'POST',
-				url: `${credentials.apiUrl}/render/${templateId}`,
+				url: apiUrl,
 				qs: {
 					download: download ? 'true' : undefined,
 				},
