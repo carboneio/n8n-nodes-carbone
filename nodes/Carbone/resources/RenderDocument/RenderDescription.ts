@@ -33,29 +33,17 @@ export const renderOperations: INodeProperties[] = [
 // Render Document Fields
 export const generateOperation: INodeProperties[] = [
 	{
-		displayName: 'Template Source',
+		displayName: 'Use Base64 Template On The Fly',
 		name: 'templateSource',
-		type: 'options',
-		default: 'id',
-		description: 'How to provide the template for document generation',
+		type: 'boolean',
+		default: false,
+		description: 'Whether to use a base64 template instead of a template ID',
 		displayOptions: {
 			show: {
 				resource: ['renderDocument'],
 				operation: ['generate'],
 			},
 		},
-		options: [
-			{
-				name: 'Template ID',
-				value: 'id',
-				description: 'Use a template ID from Carbone',
-			},
-			{
-				name: 'Template File (Base64)',
-				value: 'base64',
-				description: 'Provide the template file as base64 string',
-			},
-		],
 	},
 	{
 		displayName: 'Template ID',
@@ -68,7 +56,7 @@ export const generateOperation: INodeProperties[] = [
 			show: {
 				resource: ['renderDocument'],
 				operation: ['generate'],
-				templateSource: ['id'],
+				templateSource: [false],
 			},
 		},
 	},
@@ -83,7 +71,7 @@ export const generateOperation: INodeProperties[] = [
 			show: {
 				resource: ['renderDocument'],
 				operation: ['generate'],
-				templateSource: ['base64'],
+				templateSource: [true],
 			},
 		},
 	},

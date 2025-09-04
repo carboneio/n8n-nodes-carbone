@@ -8,11 +8,11 @@ export class RenderOperations {
 		getNodeParameter: any,
 		getCredentials: any,
 	): Promise<INodeExecutionData> {
-		const templateSource = getNodeParameter('templateSource', i) as string;
+		const templateSource = getNodeParameter('templateSource', i) as boolean;
 		let templateId: string | undefined;
 		let templateBase64: string | undefined;
 
-		if (templateSource === 'id') {
+		if (!templateSource) {
 			templateId = getNodeParameter('templateId', i) as string;
 		} else {
 			templateBase64 = getNodeParameter('templateBase64', i) as string;
@@ -67,7 +67,7 @@ export class RenderOperations {
 
 		// Construire l'URL en fonction de la source du template
 		let apiUrl: string;
-		if (templateSource === 'base64') {
+		if (templateSource) {
 			// Ajouter le template base64 au corps de la requête
 			requestBody.template = templateBase64;
 			apiUrl = `${credentials.apiUrl}/render/template`;
