@@ -31,10 +31,15 @@
   - `DELETE /template/{templateId}` - Delete template
 
 - **Document Rendering**:
-  - `POST /render/{templateId}` - Generate document from template + JSON data
+  - `POST /render/{templateId}` - Generate document from template ID + JSON data
     - Paramètres:
       - Body `data`: JSON dataset requis pour le rendu
       - Body `convertTo`: Format de conversion (pdf, docx, xlsx, ods, csv, txt, odp, ppt, pptx, jpg, png, odt, doc, html, xml, idml, epub)
+  - `POST /render/template` - Generate document from base64 template + JSON data
+    - Paramètres:
+      - Body `data`: JSON dataset requis pour le rendu
+      - Body `convertTo`: Format de conversion (pdf, docx, xlsx, ods, csv, txt, odp, ppt, pptx, jpg, png, odt, doc, html, xml, idml, epub)
+      - Body `template`: string - Template en base64 requis
   - `GET /render/{renderId}` - Retrieve generated document (file stream)
 
 - **Template Listing**:
