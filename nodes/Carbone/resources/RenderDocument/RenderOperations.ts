@@ -89,7 +89,7 @@ export class RenderOperations {
 					'Content-Type': 'application/json',
 				},
 				body: requestBody,
-				json: !download,
+				//json: !download,
 				encoding: download ? null : undefined,
 				resolveWithFullResponse: download,
 			});
