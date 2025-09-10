@@ -13,7 +13,9 @@ export class RenderOperations {
 		let templateBase64: string | undefined;
 
 		if (!templateSource) {
-			templateId = getNodeParameter('templateId', i) as string;
+			templateId = getNodeParameter('templateId', i, undefined, {
+				extractValue: true,
+			}) as string;
 		} else {
 			templateBase64 = getNodeParameter('templateBase64', i) as string;
 		}

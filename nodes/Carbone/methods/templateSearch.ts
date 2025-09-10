@@ -34,17 +34,15 @@ export async function templateSearch(
 				const templateName =
 					typeof template.name === 'string' && template.name.trim().length > 0
 						? template.name
-						: templateId;
+						: 'unnamed';
 
-				const displayName =
-					templateName && templateName !== templateId
-						? `${templateId} - ${templateName}`
-						: `${templateId}`;
+				const versionId = template.versionId || templateId;
+				const displayName = `${templateName} - ${templateId} - ${versionId}`;
 
 				if (templateName.toString().toLowerCase().includes(filter.toLowerCase())) {
 					results.push({
 						name: displayName,
-						value: templateId,
+						value: versionId,
 					});
 				}
 			}
@@ -59,16 +57,14 @@ export async function templateSearch(
 					const templateName =
 						typeof template.name === 'string' && template.name.trim().length > 0
 							? template.name
-							: templateId;
+							: 'unnamed';
 
-					const displayName =
-						templateName && templateName !== templateId
-							? `${templateId} - ${templateName}`
-							: `${templateId}`;
+					const versionId = template.versionId || templateId;
+					const displayName = `${templateName} - ${templateId} - ${versionId}`;
 
 					return {
 						name: displayName,
-						value: templateId,
+						value: versionId,
 					};
 				}),
 			};
