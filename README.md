@@ -133,3 +133,16 @@ The node uses Bearer token authentication with the Authorization header and incl
 * [Carbone.io API Reference](https://carbone.io/api-reference.html)
 * [Carbone.io Documentation](https://carbone.io/documentation.html)
 * [Carbone.io Template Guide](https://carbone.io/documentation/design/overview/getting-started.html)
+
+## Version history
+
+### 0.1.0
+- Initial release
+- Template management operations: List, Upload, Delete
+- Document rendering operations: Generate, Get
+- Advanced options for document generation (localization, currency, etc.)
+- Support for both template ID and base64 template approaches
+
+## Roadmap
+
+- Submit to become verified community nodes
