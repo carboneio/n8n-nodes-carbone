@@ -1,48 +1,135 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+# n8n-nodes-carbone
 
-# n8n-nodes-starter
+This is an n8n community node. It lets you use Carbone.io in your n8n workflows.
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](https://n8n.io). It includes the node linter and other dependencies.
+Carbone.io is a powerful document generation service that allows you to create professional PDF, DOCX, XLS, XLSX, ODT, PPTX, ODS, CSV and XML reports and documents from templates using JSON data. The easy-to-implement template concept frees you from design constraints, with a No/Low code approach.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-If you would like your node to be available on n8n cloud you can also [submit your node for verification](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/).
+[Installation](#installation)  
+[Operations](#operations)  
+[Credentials](#credentials)  
+[Compatibility](#compatibility)  
+[Usage](#usage)  
+[Resources](#resources)  
+[Version history](#version-history)  
 
-## Prerequisites
+## Installation
 
-You need the following installed on your development machine:
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
-* [git](https://git-scm.com/downloads)
-* Node.js and npm. Minimum version Node 20. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  npm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+## Operations
 
-## Using this starter
+### Template Management
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+#### List Templates
+Retrieve a list of all templates from your Carbone.io account with optional filtering capabilities.
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-   ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm run lint` to check for errors or `npm run lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+**Parameters:**
+- **Template ID**: Filter by specific template ID
+- **Version ID**: Filter by specific version ID
+- **Category**: Filter by template category
+- **Include Versions**: Include all versions for a specific template ID
+- **Search**: Search in template name (fuzzy search), version ID (exact) or template ID (exact)
+- **Limit**: Maximum number of results to return (default: 50)
+- **Cursor**: Cursor for pagination
 
-## More information
+#### Upload Template
+Upload a new template file to Carbone.io or update an existing template.
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+**Parameters:**
+- **Binary Property Name**: The name of the binary property that contains the template file
+- **Template Additional Options**:
+  - **Deployed At**: When a report is generated using the new template ID, Carbone selects the template version with the highest deployedAt timestamp that is not in the future
+  - **Enable Versioning**: Whether to enable template versioning (default: true)
+  - **Template Comment**: Comment for the template
+  - **Template ID**: The unique identifier of the template to update
+  - **Template Name**: Name for the template
 
-## License
+#### Delete Template
+Delete a template from your Carbone.io account.
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+**Parameters:**
+- **Template ID**: The unique identifier of the template to delete
+
+### Document Rendering
+
+#### Generate Document
+Generate a document from a template and JSON data.
+
+**Parameters:**
+- **Use Base64 Template On The Fly**: Whether to use a base64 template instead of a template ID
+- **Template ID**: The template ID to use for generating the document (when not using base64 template)
+- **Template File (Base64)**: The template file encoded as base64 string (when using base64 template)
+- **Data**: JSON data-set to merge into the template
+- **Convert To**: Optional: Convert the document to another format (PDF, DOCX, HTML, ODT)
+- **Download Rendered Document**: Whether to download the rendered document directly or just get the render ID to fetch it later
+
+**Document Generation Additional Options:**
+- **Complement**: Additional data to complement the main dataset
+- **Currency Rates**: Currency conversion rates
+- **Currency Source**: The source currency for conversion
+- **Currency Target**: The target currency for conversion
+- **Enum**: Enumeration values for the template
+- **Hard Refresh**: Whether to force a hard refresh of the template
+- **Language**: The language to use for localization (default: fr)
+- **Report Name**: The name of the generated report
+- **Timezone**: The timezone to use for date formatting (default: Europe/Paris)
+- **Translations**: Translation mappings for the template
+- **Variable String**: A string containing variables to be processed
+
+#### Get Document
+Retrieve a generated document from render ID.
+
+**Parameters:**
+- **Render ID**: The render ID of the generated document to retrieve
+
+## Credentials
+
+To use the Carbone.io node, you need to authenticate with your Carbone.io account.
+
+### Prerequisites
+1. Sign up for a Carbone.io account at [carbone.io](https://carbone.io/)
+2. Obtain your API key from your Carbone.io dashboard
+
+### Authentication Setup
+1. **API Key**: Your Carbone.io API key for authentication
+2. **API URL**: The base URL for Carbone.io API (default: https://api.carbone.io)
+   - Change this if you're using a self-hosted instance
+3. **Carbone API Version**: The version of the Carbone API to use (4 or 5, default: 5)
+
+The node uses Bearer token authentication with the Authorization header and includes the carbone-version header for API versioning.
+
+## Compatibility
+
+- **Tested with**: Latest stable versions of n8n
+
+## Usage
+
+### Basic Template Upload
+1. Add a Carbone node to your workflow
+2. Select "Template" as resource and "Upload" as operation
+3. Connect a node that provides the template file as binary data (e.g., Read Binary File node)
+4. Configure the binary property name to match the output of the previous node
+5. Optionally set template name and other metadata
+
+### Basic Document Generation
+1. Add a Carbone node to your workflow
+2. Select "Render Document" as resource and "Generate" as operation
+3. Choose between using a template ID or base64 template
+4. Provide the JSON data to merge into the template
+5. Select the desired output format
+6. Choose whether to download the document directly or get a render ID
+
+### Advanced Usage
+- **Template Versioning**: Enable versioning to keep track of template changes
+- **Localization**: Set language, timezone, and translations for multilingual documents
+- **Currency Conversion**: Use currency rates and source/target currency for financial documents
+
+
+## Resources
+
+* [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
+* [Carbone.io API Reference](https://carbone.io/api-reference.html)
+* [Carbone.io Documentation](https://carbone.io/documentation.html)
+* [Carbone.io Template Guide](https://carbone.io/documentation/design/overview/getting-started.html)

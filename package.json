@@ -6,14 +6,14 @@
 		"n8n-community-node-package"
 	],
 	"license": "MIT",
-	"homepage": "https://github.com/vlebert/n8n-nodes-carbone",
+	"homepage": "https://github.com/carboneio/n8n-nodes-carbone",
 	"author": {
 		"name": "Carbone.io",
 		"email": "contact@carbone.io"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/vlebert/n8n-nodes-carbone.git"
+		"url": "https://github.com/carboneio/n8n-nodes-carbone"
 	},
 	"engines": {
 		"node": ">=20.15"
