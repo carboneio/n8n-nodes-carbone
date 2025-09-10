@@ -18,6 +18,7 @@ import {
 } from './CarboneDescription';
 import { TemplateOperations } from './resources/Template/TemplateOperations';
 import { RenderOperations } from './resources/RenderDocument/RenderOperations';
+import { templateSearch } from './methods/templateSearch';
 
 export class Carbone implements INodeType {
 	description: INodeTypeDescription = {
@@ -60,6 +61,12 @@ export class Carbone implements INodeType {
 			// Additional Options (masquées par défaut)
 			...additionalOptions,
 		],
+	};
+
+	methods = {
+		listSearch: {
+			templateSearch,
+		},
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {

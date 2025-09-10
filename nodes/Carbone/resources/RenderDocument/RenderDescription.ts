@@ -48,9 +48,9 @@ export const generateOperation: INodeProperties[] = [
 	{
 		displayName: 'Template ID',
 		name: 'templateId',
-		type: 'string',
+		type: 'resourceLocator',
+		default: { mode: 'id', value: '' },
 		required: true,
-		default: '',
 		description: 'The template ID to use for generating the document',
 		displayOptions: {
 			show: {
@@ -59,6 +59,23 @@ export const generateOperation: INodeProperties[] = [
 				templateSource: [false],
 			},
 		},
+		modes: [
+			{
+				displayName: 'From List',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'templateSearch',
+					searchable: true,
+				},
+			},
+			{
+				displayName: 'ID',
+				name: 'id',
+				type: 'string',
+				placeholder: 'e.g. tmpl_123456789',
+			},
+		],
 	},
 	{
 		displayName: 'Template File (Base64)',
