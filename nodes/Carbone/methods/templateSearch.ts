@@ -23,35 +23,18 @@ export async function templateSearch(
 			json: true,
 		});
 
-		// Normalize different possible response structures into an array of templates
-		const raw = response as any;
-		let templates: any[] = [];
-
-		if (Array.isArray(raw)) {
-			templates = raw;
-		} else if (raw && raw.success && Array.isArray(raw.data)) {
-			templates = raw.data;
-		} else if (raw && Array.isArray(raw.data)) {
-			templates = raw.data;
-		} else if (raw && Array.isArray(raw.templates)) {
-			templates = raw.templates;
-		}
-
-		// Keep templates as an array to avoid runtime errors later
-		if (!Array.isArray(templates)) {
-			templates = [];
-		}
+		// Extract templates from API response
+		const templates = Array.isArray(response?.data) ? response.data : [];
 
 		if (filter) {
 			const results: INodeListSearchItems[] = [];
 
 			for (const template of templates) {
-				const templateId = template.id || template.templateId || template._id || 'unknown';
-				const fallbackName = template.filename || template.title || templateId || 'Unknown';
+				const templateId = template.id || 'unknown';
 				const templateName =
 					typeof template.name === 'string' && template.name.trim().length > 0
 						? template.name
-						: fallbackName;
+						: templateId;
 
 				const displayName =
 					templateName && templateName !== templateId
@@ -72,12 +55,11 @@ export async function templateSearch(
 		} else {
 			return {
 				results: templates.map((template: any) => {
-					const templateId = template.id || template.templateId || template._id || 'unknown';
-					const fallbackName = template.filename || template.title || templateId || 'Unknown';
+					const templateId = template.id || 'unknown';
 					const templateName =
 						typeof template.name === 'string' && template.name.trim().length > 0
 							? template.name
-							: fallbackName;
+							: templateId;
 
 					const displayName =
 						templateName && templateName !== templateId
