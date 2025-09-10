@@ -111,16 +111,12 @@ export const generateOperation: INodeProperties[] = [
 				value: 'html',
 			},
 			{
+				name: 'ODT',
+				value: 'odt',
+			},
+			{
 				name: 'PDF',
 				value: 'pdf',
-			},
-			{
-				name: 'TXT',
-				value: 'txt',
-			},
-			{
-				name: 'XLSX',
-				value: 'xlsx',
 			},
 		],
 	},
