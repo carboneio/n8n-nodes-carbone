@@ -3,7 +3,7 @@ import type {
 	INodeListSearchItems,
 	INodeListSearchResult,
 } from 'n8n-workflow';
-import { CarboneErrorHandler } from '../utils/errorHandler';
+import { NodeOperationError } from 'n8n-workflow';
 
 export async function templateSearch(
 	this: ILoadOptionsFunctions,
@@ -92,6 +92,8 @@ export async function templateSearch(
 			};
 		}
 	} catch (error) {
-		throw CarboneErrorHandler.handleApiError(error, { name: 'Carbone' } as any);
+		throw new NodeOperationError(this.getNode(), 'Failed to fetch templates from Carbone API', {
+			level: 'warning',
+		});
 	}
 }
