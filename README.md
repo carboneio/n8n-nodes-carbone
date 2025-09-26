@@ -12,7 +12,39 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Operations
 
-### Template Management
+### Document
+
+#### Generate Document
+Generate a document from a template and JSON data.
+
+**Parameters:**
+- **Use Base64 Template On The Fly**: Whether to use a base64 template instead of a template ID
+- **Template ID**: The template ID to use for generating the document (when not using base64 template)
+- **Template File (Base64)**: The template file encoded as base64 string (when using base64 template)
+- **Data**: JSON data-set to merge into the template
+- **Convert To**: Optional: Convert the document to another format (PDF, DOCX, HTML, ODT)
+- **Download Rendered Document**: Whether to download the rendered document directly or just get the render ID to fetch it later
+
+**Document Generation Additional Options:**
+- **Complement**: Additional data to complement the main dataset
+- **Currency Rates**: Currency conversion rates
+- **Currency Source**: The source currency for conversion
+- **Currency Target**: The target currency for conversion
+- **Enum**: Enumeration values for the template
+- **Hard Refresh**: Whether to force a hard refresh of the template
+- **Language**: The language to use for localization (default: fr)
+- **Report Name**: The name of the generated report
+- **Timezone**: The timezone to use for date formatting (default: Europe/Paris)
+- **Translations**: Translation mappings for the template
+- **Variable String**: A string containing variables to be processed
+
+#### Download Document
+Retrieve a generated document from render ID.
+
+**Parameters:**
+- **Render ID**: The render ID of the generated document to retrieve
+
+### Templates
 
 #### List Templates
 Retrieve a list of all templates from your Carbone.io account with optional filtering capabilities.
@@ -44,37 +76,6 @@ Delete a template from your Carbone.io account.
 **Parameters:**
 - **Template ID**: The unique identifier of the template to delete
 
-### Document Rendering
-
-#### Generate Document
-Generate a document from a template and JSON data.
-
-**Parameters:**
-- **Use Base64 Template On The Fly**: Whether to use a base64 template instead of a template ID
-- **Template ID**: The template ID to use for generating the document (when not using base64 template)
-- **Template File (Base64)**: The template file encoded as base64 string (when using base64 template)
-- **Data**: JSON data-set to merge into the template
-- **Convert To**: Optional: Convert the document to another format (PDF, DOCX, HTML, ODT)
-- **Download Rendered Document**: Whether to download the rendered document directly or just get the render ID to fetch it later
-
-**Document Generation Additional Options:**
-- **Complement**: Additional data to complement the main dataset
-- **Currency Rates**: Currency conversion rates
-- **Currency Source**: The source currency for conversion
-- **Currency Target**: The target currency for conversion
-- **Enum**: Enumeration values for the template
-- **Hard Refresh**: Whether to force a hard refresh of the template
-- **Language**: The language to use for localization (default: fr)
-- **Report Name**: The name of the generated report
-- **Timezone**: The timezone to use for date formatting (default: Europe/Paris)
-- **Translations**: Translation mappings for the template
-- **Variable String**: A string containing variables to be processed
-
-#### Get Document
-Retrieve a generated document from render ID.
-
-**Parameters:**
-- **Render ID**: The render ID of the generated document to retrieve
 
 ## Credentials
 
@@ -94,7 +95,9 @@ The node uses Bearer token authentication with the Authorization header and incl
 
 ## Compatibility
 
-- **Tested with**: Latest stable versions of n8n
+**Tested with N8N Version**
+- 1.111.1
+- 1.112.5
 
 ## Usage
 
@@ -128,13 +131,9 @@ The node uses Bearer token authentication with the Authorization header and incl
 
 ## Version history
 
-### 0.1.0
+### 1.0.0
 - Initial release
 - Template management operations: List, Upload, Delete
 - Document rendering operations: Generate, Get
 - Advanced options for document generation (localization, currency, etc.)
 - Support for both template ID and base64 template approaches
-
-## Roadmap
-
-- Submit to become verified community nodes
