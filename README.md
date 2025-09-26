@@ -4,6 +4,23 @@ This is an n8n community node. It lets you use Carbone.io in your n8n workflows.
 
 Carbone.io is a powerful document generation service that allows you to create professional PDF, DOCX, XLS, XLSX, ODT, PPTX, ODS, CSV and XML reports and documents from templates using JSON data. The easy-to-implement template concept frees you from design constraints, with a No/Low code approach.
 
+**Features**
+- Generate documents from templates using JSON data.
+- Upload, manage, and delete templates.
+- Advanced options: localization, currency conversion, and template versioning.
+- Supports Carbone API v4 and v5.
+
+
+**Real-World Use Cases for Carbone.io**<br>
+Carbone.io is ideal for generating:
+- Invoices and Receipts: Automate billing with dynamic data.
+- Contracts: Populate legal templates with customer details.
+- Reports: Financial, sales, or operational reports with charts and tables.
+- Proposals: Customized business proposals for clients.
+- Certificates: Automated certificates for training or events.
+- Labels and Packing Slips: Shipping and logistics documents.
+- Personalized Letters: Mass mail with custom recipient data.
+
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
 ## Installation
@@ -95,9 +112,9 @@ The node uses Bearer token authentication with the Authorization header and incl
 
 ## Compatibility
 
-**Tested with N8N Version**
-- 1.111.1
-- 1.112.5
+Tested with:
+- n8n: `1.111.1`, `1.112.5`
+- Carbone API: `v4`, `v5`
 
 ## Usage
 
