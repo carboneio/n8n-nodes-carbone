@@ -115,6 +115,7 @@ The node uses Bearer token authentication with the Authorization header and incl
 Tested with:
 - n8n: `1.111.1`, `1.112.5`
 - Carbone API: `v4`, `v5`
+- NodeJS: `22.10.0`
 
 ## Usage
 
