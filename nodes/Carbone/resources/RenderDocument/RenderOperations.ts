@@ -1,30 +1,41 @@
-import { INodeExecutionData, NodeOperationError } from 'n8n-workflow';
+import { IExecuteFunctions, INodeExecutionData, NodeOperationError } from 'n8n-workflow';
 import { CarboneErrorHandler } from '../../utils/errorHandler';
 
 export class RenderOperations {
+	private static parseResponse(response: any): any {
+		// Parser la réponse JSON si c'est une chaîne pour éviter le double encodage
+		if (typeof response === 'string') {
+			try {
+				return JSON.parse(response);
+			} catch (error) {
+				// Si le parsing échoue, utiliser la réponse originale
+				return response;
+			}
+		}
+		return response;
+	}
+
 	async generateDocument(
+		this: IExecuteFunctions,
 		i: number,
-		helpers: any,
-		getNodeParameter: any,
-		getCredentials: any,
 	): Promise<INodeExecutionData> {
-		const templateSource = getNodeParameter('templateSource', i) as boolean;
+		const templateSource = this.getNodeParameter('templateSource', i) as boolean;
 		let templateId: string | undefined;
 		let templateBase64: string | undefined;
 
 		if (!templateSource) {
-			templateId = getNodeParameter('templateId', i, undefined, {
+			templateId = this.getNodeParameter('templateId', i, undefined, {
 				extractValue: true,
 			}) as string;
 		} else {
-			templateBase64 = getNodeParameter('templateBase64', i) as string;
+			templateBase64 = this.getNodeParameter('templateBase64', i) as string;
 		}
-		let data = getNodeParameter('data', i);
-		const convertTo = getNodeParameter('convertTo', i, 'pdf') as string;
-		const download = getNodeParameter('download', i, false) as boolean;
-		const additionalOptions = getNodeParameter('generateAdditionalOptions', i, {}) as any;
+		let data = this.getNodeParameter('data', i);
+		const convertTo = this.getNodeParameter('convertTo', i, 'pdf') as string;
+		const download = this.getNodeParameter('download', i, false) as boolean;
+		const additionalOptions = this.getNodeParameter('generateAdditionalOptions', i, {}) as any;
 
-		const credentials = (await getCredentials('carboneApi')) as any;
+		const credentials = (await this.getCredentials('carboneApi')) as any;
 
 		// Gérer le parsing JSON pour les deux formats: string et objet
 		if (typeof data === 'string') {
@@ -32,7 +43,7 @@ export class RenderOperations {
 				data = JSON.parse(data);
 			} catch (error) {
 				throw new NodeOperationError(
-					{ name: 'Carbone' } as any,
+					this.getNode(),
 					`Invalid JSON data: ${error.message}`,
 					{
 						description: 'The data parameter must be valid JSON. Please check your JSON syntax.',
@@ -79,22 +90,23 @@ export class RenderOperations {
 		}
 
 		try {
-			const response = await helpers.request({
-				method: 'POST',
-				url: apiUrl,
-				qs: {
-					download: download ? 'true' : undefined,
+			const response = await this.helpers.requestWithAuthentication.call(
+				this,
+				'carboneApi',
+				{
+					method: 'POST',
+					url: apiUrl,
+					qs: {
+						download: download ? 'true' : undefined,
+					},
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: requestBody,
+					encoding: download ? null : undefined,
+					resolveWithFullResponse: download,
 				},
-				headers: {
-					Authorization: `Bearer ${credentials.apiKey}`,
-					'carbone-version': credentials.carboneVersion,
-					'Content-Type': 'application/json',
-				},
-				body: requestBody,
-				//json: !download,
-				encoding: download ? null : undefined,
-				resolveWithFullResponse: download,
-			});
+			);
 
 			if (download) {
 				// Extraire le nom du fichier depuis Content-Disposition
@@ -108,7 +120,7 @@ export class RenderOperations {
 
 				// Laisser n8n gérer le content-type automatiquement
 				const binaryData = {
-					[fileName]: await helpers.prepareBinaryData(response.body, fileName),
+					[fileName]: await this.helpers.prepareBinaryData(response.body, fileName),
 				};
 
 				return {
@@ -125,7 +137,7 @@ export class RenderOperations {
 				};
 			} else {
 				return {
-					json: this.parseResponse(response),
+					json: RenderOperations.parseResponse(response),
 					pairedItem: {
 						item: i,
 						input: 0,
@@ -133,30 +145,28 @@ export class RenderOperations {
 				};
 			}
 		} catch (error) {
-			throw CarboneErrorHandler.handleApiError(error, { name: 'Carbone' } as any);
+			throw CarboneErrorHandler.handleApiError(error, this.getNode());
 		}
 	}
 
 	async getDocument(
+		this: IExecuteFunctions,
 		i: number,
-		helpers: any,
-		getNodeParameter: any,
-		getCredentials: any,
 	): Promise<INodeExecutionData> {
-		const renderId = getNodeParameter('renderId', i) as string;
-		const credentials = (await getCredentials('carboneApi')) as any;
+		const renderId = this.getNodeParameter('renderId', i) as string;
+		const credentials = (await this.getCredentials('carboneApi')) as any;
 
 		try {
-			const response = await helpers.request({
-				method: 'GET',
-				url: `${credentials.apiUrl}/render/${renderId}`,
-				headers: {
-					Authorization: `Bearer ${credentials.apiKey}`,
-					'carbone-version': credentials.carboneVersion,
+			const response = await this.helpers.requestWithAuthentication.call(
+				this,
+				'carboneApi',
+				{
+					method: 'GET',
+					url: `${credentials.apiUrl}/render/${renderId}`,
+					encoding: null, // Important pour obtenir les données binaires
+					resolveWithFullResponse: true,
 				},
-				encoding: null, // Important pour obtenir les données binaires
-				resolveWithFullResponse: true,
-			});
+			);
 
 			// Extraire le nom du fichier depuis Content-Disposition
 			const contentDisposition = response.headers['content-disposition'] || '';
@@ -169,7 +179,7 @@ export class RenderOperations {
 
 			// Laisser n8n gérer le content-type automatiquement
 			const binaryData = {
-				[fileName]: await helpers.prepareBinaryData(response.body, fileName),
+				[fileName]: await this.helpers.prepareBinaryData(response.body, fileName),
 			};
 
 			return {
@@ -186,20 +196,7 @@ export class RenderOperations {
 				},
 			};
 		} catch (error) {
-			throw CarboneErrorHandler.handleApiError(error, { name: 'Carbone' } as any);
+			throw CarboneErrorHandler.handleApiError(error, this.getNode());
 		}
-	}
-
-	private parseResponse(response: any): any {
-		// Parser la réponse JSON si c'est une chaîne pour éviter le double encodage
-		if (typeof response === 'string') {
-			try {
-				return JSON.parse(response);
-			} catch (error) {
-				// Si le parsing échoue, utiliser la réponse originale
-				return response;
-			}
-		}
-		return response;
 	}
 }

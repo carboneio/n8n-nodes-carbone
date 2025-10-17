@@ -12,16 +12,15 @@ export async function templateSearch(
 	const credentials = await this.getCredentials('carboneApi');
 
 	try {
-		const response = await this.helpers.request({
-			method: 'GET',
-			url: `${credentials.apiUrl}/templates`,
-			headers: {
-				Authorization: `Bearer ${credentials.apiKey}`,
-				'carbone-version': credentials.carboneVersion,
+		const response = await this.helpers.requestWithAuthentication.call(
+			this,
+			'carboneApi',
+			{
+				method: 'GET',
+				url: `${credentials.apiUrl}/templates`,
+				json: true,
 			},
-			// Ensure the helper parses the response as JSON
-			json: true,
-		});
+		);
 
 		// Extract templates from API response
 		const templates = Array.isArray(response?.data) ? response.data : [];
