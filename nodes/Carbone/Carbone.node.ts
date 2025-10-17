@@ -97,7 +97,7 @@ export class Carbone implements INodeType {
 					} else {
 						throw new NodeOperationError(
 							this.getNode(),
-							`L'opération ${operation} sur la ressource ${resource} n'est pas implémentée`,
+							`Operation ${operation} on resource ${resource} is not implemented`,
 						);
 					}
 				} else if (resource === 'renderDocument') {
@@ -110,13 +110,13 @@ export class Carbone implements INodeType {
 					} else {
 						throw new NodeOperationError(
 							this.getNode(),
-							`L'opération ${operation} sur la ressource ${resource} n'est pas implémentée`,
+							`Operation ${operation} on resource ${resource} is not implemented`,
 						);
 					}
 				} else {
 					throw new NodeOperationError(
 						this.getNode(),
-						`La ressource ${resource} n'est pas implémentée`,
+						`Resource ${resource} is not implemented`,
 					);
 				}
 
