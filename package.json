@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-carbone",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "n8n node for Carbone.io services - template management and document generation. Easily integrate the generation of PDF, DOCX, XLS, XLSX, ODT, PPTX, ODS, CSV and XML reports and documents into your applications, using data from your existing JSON APIs. The easy-to-implement template concept frees you from design constraints, with a No/Low code approach.",
 	"keywords": [
 		"n8n-community-node-package",

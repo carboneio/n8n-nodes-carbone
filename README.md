@@ -149,6 +149,12 @@ Tested with:
 
 ## Version history
 
+### 1.1.0
+- Removed redundant routing configurations from operation descriptions
+- Replaced all `helpers.request()` calls with `this.helpers.httpRequestWithAuthentication()`
+- Translate French error messages to English
+
+
 ### 1.0.0
 - Initial release
 - Template management operations: List, Upload, Delete
