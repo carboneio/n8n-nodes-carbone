@@ -1,34 +1,59 @@
-import { INodeExecutionData, NodeOperationError } from 'n8n-workflow';
+import { IExecuteFunctions, INodeExecutionData, NodeOperationError } from 'n8n-workflow';
 import { CarboneErrorHandler } from '../../utils/errorHandler';
 
 export class TemplateOperations {
-	private convertIsoToUnixTimestamp(isoString: string): string {
+	private static convertIsoToUnixTimestamp(isoString: string): string {
 		return Math.floor(new Date(isoString).getTime() / 1000).toString();
 	}
 
-	private convertUnixTimestampToIso(timestamp: number): string | null {
+	private static convertUnixTimestampToIso(timestamp: number): string | null {
 		if (timestamp === 0) {
 			return null;
 		}
 		return new Date(timestamp * 1000).toISOString();
 	}
 
+	private static parseResponse(response: any): any {
+		// Parser la réponse JSON si c'est une chaîne pour éviter le double encodage
+		if (typeof response === 'string') {
+			try {
+				response = JSON.parse(response);
+			} catch (error) {
+				// Si le parsing échoue, utiliser la réponse originale
+				return response;
+			}
+		}
+
+		// Si la réponse contient un tableau de données, convertir les timestamps en dates ISO
+		if (response && response.data && Array.isArray(response.data)) {
+			response.data = response.data.map((item: any) => {
+				if (item.deployedAt !== undefined) {
+					item.deployedAt = TemplateOperations.convertUnixTimestampToIso(item.deployedAt);
+				}
+				if (item.createdAt !== undefined) {
+					item.createdAt = TemplateOperations.convertUnixTimestampToIso(item.createdAt);
+				}
+				return item;
+			});
+		}
+
+		return response;
+	}
+
 	async listTemplates(
+		this: IExecuteFunctions,
 		i: number,
-		helpers: any,
-		getNodeParameter: any,
-		getCredentials: any,
 	): Promise<INodeExecutionData> {
-		const credentials = (await getCredentials('carboneApi')) as any;
+		const credentials = (await this.getCredentials('carboneApi')) as any;
 
 		// Get all list parameters
-		const id = getNodeParameter('id', i, '') as string;
-		const versionId = getNodeParameter('versionId', i, '') as string;
-		const category = getNodeParameter('category', i, '') as string;
-		const includeVersions = getNodeParameter('includeVersions', i, false) as boolean;
-		const search = getNodeParameter('search', i, '') as string;
-		const limit = getNodeParameter('limit', i, 50) as number;
-		const cursor = getNodeParameter('cursor', i, '') as string;
+		const id = this.getNodeParameter('id', i, '') as string;
+		const versionId = this.getNodeParameter('versionId', i, '') as string;
+		const category = this.getNodeParameter('category', i, '') as string;
+		const includeVersions = this.getNodeParameter('includeVersions', i, false) as boolean;
+		const search = this.getNodeParameter('search', i, '') as string;
+		const limit = this.getNodeParameter('limit', i, 50) as number;
+		const cursor = this.getNodeParameter('cursor', i, '') as string;
 
 		// Build query parameters
 		const qs: any = {};
@@ -41,49 +66,46 @@ export class TemplateOperations {
 		if (cursor) qs.cursor = cursor;
 
 		try {
-			// Make the request to list templates
-			const response = await helpers.request({
-				method: 'GET',
-				url: `${credentials.apiUrl}/templates`,
-				headers: {
-					Authorization: `Bearer ${credentials.apiKey}`,
-					'carbone-version': credentials.carboneVersion,
+			// Make the request to list templates using modern authentication helper
+			const response = await this.helpers.requestWithAuthentication.call(
+				this,
+				'carboneApi',
+				{
+					method: 'GET',
+					url: `${credentials.apiUrl}/templates`,
+					qs: qs,
 				},
-				qs: qs,
-			});
+			);
 
 			return {
-				json: this.parseResponse(response),
+				json: TemplateOperations.parseResponse(response),
 				pairedItem: {
 					item: i,
 					input: 0,
 				},
 			};
 		} catch (error) {
-			throw CarboneErrorHandler.handleApiError(error, { name: 'Carbone' } as any);
+			throw CarboneErrorHandler.handleApiError(error, this.getNode());
 		}
 	}
 
 	async uploadTemplate(
+		this: IExecuteFunctions,
 		i: number,
-		helpers: any,
-		getNodeParameter: any,
-		getCredentials: any,
-		getInputData: any,
 	): Promise<INodeExecutionData> {
-		const binaryPropertyName = getNodeParameter('binaryPropertyName', i) as string;
-		const credentials = (await getCredentials('carboneApi')) as any;
+		const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
+		const credentials = (await this.getCredentials('carboneApi')) as any;
 
 		// Valider les données binaires
-		helpers.assertBinaryData(i, binaryPropertyName);
+		this.helpers.assertBinaryData(i, binaryPropertyName);
 
 		// Récupérer les informations du fichier binaire
-		const binaryData = getInputData()[i].binary as any;
+		const binaryData = this.getInputData()[i].binary as any;
 		const binaryProperty = binaryData[binaryPropertyName];
 
 		if (!binaryProperty) {
 			throw new NodeOperationError(
-				{ name: 'Carbone' } as any,
+				this.getNode(),
 				`Binary property '${binaryPropertyName}' not found`,
 				{
 					description: 'Please ensure the binary data is properly configured in the previous node',
@@ -92,11 +114,11 @@ export class TemplateOperations {
 			);
 		}
 
-		const fileBuffer = await helpers.getBinaryDataBuffer(i, binaryPropertyName);
+		const fileBuffer = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
 		const fileName = binaryProperty.fileName || 'template';
 
 		// Get additional options for template upload
-		const templateUploadAdditionalOptions = getNodeParameter(
+		const templateUploadAdditionalOptions = this.getNodeParameter(
 			'templateUploadAdditionalOptions',
 			i,
 			{},
@@ -145,91 +167,62 @@ export class TemplateOperations {
 				typeof deployedAt === 'string' &&
 				/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(deployedAt)
 			) {
-				formData.deployedAt = this.convertIsoToUnixTimestamp(deployedAt);
+				formData.deployedAt = TemplateOperations.convertIsoToUnixTimestamp(deployedAt);
 			} else {
 				formData.deployedAt = deployedAt;
 			}
 		}
 
 		try {
-			// Faire la requête d'upload
-			const response = await helpers.request({
-				method: 'POST',
-				url: `${credentials.apiUrl}/template`,
-				headers: {
-					Authorization: `Bearer ${credentials.apiKey}`,
-					'carbone-version': credentials.carboneVersion,
+			// Faire la requête d'upload using modern authentication helper
+			const response = await this.helpers.requestWithAuthentication.call(
+				this,
+				'carboneApi',
+				{
+					method: 'POST',
+					url: `${credentials.apiUrl}/template`,
+					formData: formData,
 				},
-				formData: formData,
-			});
+			);
 
 			return {
-				json: this.parseResponse(response),
+				json: TemplateOperations.parseResponse(response),
 				pairedItem: {
 					item: i,
 					input: 0,
 				},
 			};
 		} catch (error) {
-			throw CarboneErrorHandler.handleApiError(error, { name: 'Carbone' } as any);
+			throw CarboneErrorHandler.handleApiError(error, this.getNode());
 		}
 	}
 
 	async deleteTemplate(
+		this: IExecuteFunctions,
 		i: number,
-		helpers: any,
-		getNodeParameter: any,
-		getCredentials: any,
 	): Promise<INodeExecutionData> {
-		const templateId = getNodeParameter('templateId', i) as string;
-		const credentials = (await getCredentials('carboneApi')) as any;
+		const templateId = this.getNodeParameter('templateId', i) as string;
+		const credentials = (await this.getCredentials('carboneApi')) as any;
 
 		try {
-			const response = await helpers.request({
-				method: 'DELETE',
-				url: `${credentials.apiUrl}/template/${templateId}`,
-				headers: {
-					Authorization: `Bearer ${credentials.apiKey}`,
-					'carbone-version': credentials.carboneVersion,
+			const response = await this.helpers.requestWithAuthentication.call(
+				this,
+				'carboneApi',
+				{
+					method: 'DELETE',
+					url: `${credentials.apiUrl}/template/${templateId}`,
 				},
-			});
+			);
 
 			return {
-				json: this.parseResponse(response),
+				json: TemplateOperations.parseResponse(response),
 				pairedItem: {
 					item: i,
 					input: 0,
 				},
 			};
 		} catch (error) {
-			throw CarboneErrorHandler.handleApiError(error, { name: 'Carbone' } as any);
+			throw CarboneErrorHandler.handleApiError(error, this.getNode());
 		}
-	}
-
-	private parseResponse(response: any): any {
-		// Parser la réponse JSON si c'est une chaîne pour éviter le double encodage
-		if (typeof response === 'string') {
-			try {
-				response = JSON.parse(response);
-			} catch (error) {
-				// Si le parsing échoue, utiliser la réponse originale
-				return response;
-			}
-		}
-
-		// Si la réponse contient un tableau de données, convertir les timestamps en dates ISO
-		if (response && response.data && Array.isArray(response.data)) {
-			response.data = response.data.map((item: any) => {
-				if (item.deployedAt !== undefined) {
-					item.deployedAt = this.convertUnixTimestampToIso(item.deployedAt);
-				}
-				if (item.createdAt !== undefined) {
-					item.createdAt = this.convertUnixTimestampToIso(item.createdAt);
-				}
-				return item;
-			});
-		}
-
-		return response;
 	}
 }

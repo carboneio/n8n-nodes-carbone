@@ -18,36 +18,18 @@ export const templateOperations: INodeProperties[] = [
 				value: 'list',
 				action: 'List templates',
 				description: 'List templates from Carbone.io',
-				routing: {
-					request: {
-						method: 'GET',
-						url: '/templates',
-					},
-				},
 			},
 			{
 				name: 'Upload',
 				value: 'upload',
 				action: 'Upload template',
 				description: 'Upload a template to Carbone.io',
-				routing: {
-					request: {
-						method: 'POST',
-						url: '/template',
-					},
-				},
 			},
 			{
 				name: 'Delete',
 				value: 'delete',
 				action: 'Delete template',
 				description: 'Delete a template from Carbone.io',
-				routing: {
-					request: {
-						method: 'DELETE',
-						url: '/template/{{$parameter.templateId}}',
-					},
-				},
 			},
 		],
 		default: 'upload',
@@ -103,13 +85,6 @@ export const listOperation: INodeProperties[] = [
 				operation: ['list'],
 			},
 		},
-		routing: {
-			request: {
-				qs: {
-					id: '={{$value}}',
-				},
-			},
-		},
 	},
 	{
 		displayName: 'Version ID',
@@ -121,13 +96,6 @@ export const listOperation: INodeProperties[] = [
 			show: {
 				resource: ['template'],
 				operation: ['list'],
-			},
-		},
-		routing: {
-			request: {
-				qs: {
-					versionId: '={{$value}}',
-				},
 			},
 		},
 	},
@@ -143,13 +111,6 @@ export const listOperation: INodeProperties[] = [
 				operation: ['list'],
 			},
 		},
-		routing: {
-			request: {
-				qs: {
-					category: '={{$value}}',
-				},
-			},
-		},
 	},
 	{
 		displayName: 'Include Versions',
@@ -161,13 +122,6 @@ export const listOperation: INodeProperties[] = [
 			show: {
 				resource: ['template'],
 				operation: ['list'],
-			},
-		},
-		routing: {
-			request: {
-				qs: {
-					includeVersions: '={{$value}}',
-				},
 			},
 		},
 	},
@@ -182,13 +136,6 @@ export const listOperation: INodeProperties[] = [
 			show: {
 				resource: ['template'],
 				operation: ['list'],
-			},
-		},
-		routing: {
-			request: {
-				qs: {
-					search: '={{$value}}',
-				},
 			},
 		},
 	},
@@ -207,13 +154,6 @@ export const listOperation: INodeProperties[] = [
 				operation: ['list'],
 			},
 		},
-		routing: {
-			request: {
-				qs: {
-					limit: '={{$value}}',
-				},
-			},
-		},
 	},
 	{
 		displayName: 'Cursor',
@@ -225,13 +165,6 @@ export const listOperation: INodeProperties[] = [
 			show: {
 				resource: ['template'],
 				operation: ['list'],
-			},
-		},
-		routing: {
-			request: {
-				qs: {
-					cursor: '={{$value}}',
-				},
 			},
 		},
 	},

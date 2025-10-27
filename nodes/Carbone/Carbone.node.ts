@@ -87,62 +87,36 @@ export class Carbone implements INodeType {
 				if (resource === 'template') {
 					if (operation === 'list') {
 						// Template List Operation
-						result = await templateOps.listTemplates(
-							i,
-							this.helpers,
-							this.getNodeParameter.bind(this),
-							this.getCredentials.bind(this),
-						);
+						result = await templateOps.listTemplates.call(this, i);
 					} else if (operation === 'upload') {
 						// Template Upload Operation
-						result = await templateOps.uploadTemplate(
-							i,
-							this.helpers,
-							this.getNodeParameter.bind(this),
-							this.getCredentials.bind(this),
-							this.getInputData.bind(this),
-						);
+						result = await templateOps.uploadTemplate.call(this, i);
 					} else if (operation === 'delete') {
 						// Template Delete Operation
-						result = await templateOps.deleteTemplate(
-							i,
-							this.helpers,
-							this.getNodeParameter.bind(this),
-							this.getCredentials.bind(this),
-						);
+						result = await templateOps.deleteTemplate.call(this, i);
 					} else {
 						throw new NodeOperationError(
 							this.getNode(),
-							`L'opération ${operation} sur la ressource ${resource} n'est pas implémentée`,
+							`Operation ${operation} on resource ${resource} is not implemented`,
 						);
 					}
 				} else if (resource === 'renderDocument') {
 					if (operation === 'generate') {
 						// Render Generate Operation
-						result = await renderOps.generateDocument(
-							i,
-							this.helpers,
-							this.getNodeParameter.bind(this),
-							this.getCredentials.bind(this),
-						);
+						result = await renderOps.generateDocument.call(this, i);
 					} else if (operation === 'get') {
 						// Render Get Operation
-						result = await renderOps.getDocument(
-							i,
-							this.helpers,
-							this.getNodeParameter.bind(this),
-							this.getCredentials.bind(this),
-						);
+						result = await renderOps.getDocument.call(this, i);
 					} else {
 						throw new NodeOperationError(
 							this.getNode(),
-							`L'opération ${operation} sur la ressource ${resource} n'est pas implémentée`,
+							`Operation ${operation} on resource ${resource} is not implemented`,
 						);
 					}
 				} else {
 					throw new NodeOperationError(
 						this.getNode(),
-						`La ressource ${resource} n'est pas implémentée`,
+						`Resource ${resource} is not implemented`,
 					);
 				}
 
