@@ -58,24 +58,36 @@
 - **Authentification**: Bearer token via header `Authorization`
 - **Host**: api.carbone.io (HTTPS)
 
+## Environnement de développement
+- **CLI officiel n8n**: Le projet utilise `@n8n/node-cli` pour le développement, build et tests
+- **Configuration ESLint**: Format flat config moderne (`eslint.config.mjs`) avec règles n8n officielles
+- **Hot-reload**: Le serveur de développement recharge automatiquement les modifications
+
 ## Build and Test Commands
-- `npm run build` - Compile TypeScript et copie les icônes
-- `npm run dev` - Mode développement avec watch TypeScript
-- `npm run lint` - Vérification du code avec ESLint
+- `npm run build` - Compile TypeScript avec le CLI n8n et copie les icônes (via gulp)
+- `npm run dev` - Lance une instance n8n locale avec hot-reload sur `localhost:5678`
+- `npm run lint` - Vérification du code avec ESLint 9 (règles strictes community nodes)
 - `npm run lintfix` - Correction automatique des problèmes de linting
 - `npm run format` - Formatage du code avec Prettier
-- `npm run prepublishOnly` - Build + linting avant publication
+- `npm run prepublishOnly` - Validation prerelease + build des icônes avant publication npm
 
 ## Code Style Guidelines
 - **TypeScript**: Configuration stricte (target ES2019, CommonJS)
-- **ESLint**: Plugin `eslint-plugin-n8n-nodes-base` avec règles spécifiques n8n
+- **ESLint 9**: Configuration flat config héritée de `@n8n/node-cli/eslint`
+  - Règles community nodes strictes (requis pour n8n Cloud)
+  - Détection des fonctions dépréciées (ex: `requestWithAuthentication`)
+  - Validation des icônes et structure des nœuds
+  - Typage TypeScript strict (pas de `any`)
 - **Prettier**: Formatage automatique appliqué via `npm run format`
 - **Structure**: Convention de nommage et organisation des fichiers selon standards n8n
 
 ## Testing Instructions
 Pour tester les modifications :
-1. Exécuter `npm run build` pour compiler le projet
+1. Exécuter `npm run dev` pour lancer n8n localement avec le nœud chargé
+   - Le serveur démarre sur `http://localhost:5678`
+   - Les modifications sont rechargées automatiquement (hot-reload)
+   - Vous pouvez tester directement dans l'interface n8n
 2. Exécuter `npm run lint` pour vérifier la conformité du code
-3. Tester le nœud dans une instance n8n locale en chargeant le package
+3. Exécuter `npm run build` pour compiler avant publication
 4. Vérifier le bon fonctionnement des opérations template et render
 5. Valider les retours API et la gestion des erreurs
