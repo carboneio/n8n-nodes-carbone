@@ -40,12 +40,12 @@
 	},
 	"main": "index.js",
 	"scripts": {
-		"build": "npx rimraf dist && tsc && gulp build:icons",
-		"dev": "tsc --watch",
+		"build": "n8n-node build && gulp build:icons",
+		"dev": "n8n-node dev",
 		"format": "prettier nodes credentials --write",
-		"lint": "eslint nodes credentials package.json",
-		"lintfix": "eslint nodes credentials package.json --fix",
-		"prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+		"lint": "n8n-node lint",
+		"lintfix": "n8n-node lint --fix",
+		"prepublishOnly": "n8n-node prerelease && gulp build:icons"
 	},
 	"files": [
 		"dist"
@@ -60,8 +60,10 @@
 		]
 	},
 	"devDependencies": {
-		"@typescript-eslint/parser": "~8.32.0",
-		"eslint": "^8.57.0",
+		"@n8n/node-cli": "^0.17.0",
+		"@typescript-eslint/eslint-plugin": "^8.48.0",
+		"@typescript-eslint/parser": "^8.48.0",
+		"eslint": "^9.39.1",
 		"eslint-plugin-n8n-nodes-base": "^1.16.3",
 		"gulp": "^5.0.0",
 		"prettier": "^3.5.3",
