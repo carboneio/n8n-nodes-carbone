@@ -1,50 +1,80 @@
-import { IExecuteFunctions, INodeExecutionData, NodeOperationError } from 'n8n-workflow';
+import { IExecuteFunctions, INodeExecutionData, NodeOperationError, IDataObject } from 'n8n-workflow';
 import { CarboneErrorHandler } from '../../utils/errorHandler';
+
+interface CarboneCredentials {
+	apiKey: string;
+	apiUrl: string;
+	carboneVersion: string;
+}
+
+interface TemplateUploadOptions {
+	versioning?: boolean;
+	id?: string;
+	name?: string;
+	comment?: string;
+	deployedAt?: string;
+}
+
+interface TemplateItem {
+	deployedAt?: number | string;
+	createdAt?: number | string;
+	[key: string]: unknown;
+}
+
+interface TemplateResponse {
+	data?: TemplateItem[];
+	[key: string]: unknown;
+}
 
 export class TemplateOperations {
 	private static convertIsoToUnixTimestamp(isoString: string): string {
 		return Math.floor(new Date(isoString).getTime() / 1000).toString();
 	}
 
-	private static convertUnixTimestampToIso(timestamp: number): string | null {
+	private static convertUnixTimestampToIso(timestamp: number): string | undefined {
 		if (timestamp === 0) {
-			return null;
+			return undefined;
 		}
 		return new Date(timestamp * 1000).toISOString();
 	}
 
-	private static parseResponse(response: any): any {
+	private static parseResponse(response: unknown): unknown {
 		// Parser la réponse JSON si c'est une chaîne pour éviter le double encodage
+		let parsedResponse: unknown = response;
 		if (typeof response === 'string') {
 			try {
-				response = JSON.parse(response);
-			} catch (error) {
+				parsedResponse = JSON.parse(response);
+			} catch {
 				// Si le parsing échoue, utiliser la réponse originale
 				return response;
 			}
 		}
 
 		// Si la réponse contient un tableau de données, convertir les timestamps en dates ISO
-		if (response && response.data && Array.isArray(response.data)) {
-			response.data = response.data.map((item: any) => {
-				if (item.deployedAt !== undefined) {
+		if (parsedResponse && typeof parsedResponse === 'object' && 'data' in parsedResponse) {
+			const templateResponse = parsedResponse as TemplateResponse;
+			if (Array.isArray(templateResponse.data)) {
+				templateResponse.data = templateResponse.data.map((item: TemplateItem) => {
+				if (item.deployedAt !== undefined && typeof item.deployedAt === 'number') {
 					item.deployedAt = TemplateOperations.convertUnixTimestampToIso(item.deployedAt);
 				}
-				if (item.createdAt !== undefined) {
+				if (item.createdAt !== undefined && typeof item.createdAt === 'number') {
 					item.createdAt = TemplateOperations.convertUnixTimestampToIso(item.createdAt);
 				}
 				return item;
 			});
+				return templateResponse;
+			}
 		}
 
-		return response;
+		return parsedResponse;
 	}
 
 	async listTemplates(
 		this: IExecuteFunctions,
 		i: number,
 	): Promise<INodeExecutionData> {
-		const credentials = (await this.getCredentials('carboneApi')) as any;
+		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
 
 		// Get all list parameters
 		const id = this.getNodeParameter('id', i, '') as string;
@@ -56,7 +86,7 @@ export class TemplateOperations {
 		const cursor = this.getNodeParameter('cursor', i, '') as string;
 
 		// Build query parameters
-		const qs: any = {};
+		const qs: Record<string, string | number | boolean> = {};
 		if (id) qs.id = id;
 		if (versionId) qs.versionId = versionId;
 		if (category) qs.category = category;
@@ -67,7 +97,7 @@ export class TemplateOperations {
 
 		try {
 			// Make the request to list templates using modern authentication helper
-			const response = await this.helpers.requestWithAuthentication.call(
+			const response = await this.helpers.httpRequestWithAuthentication.call(
 				this,
 				'carboneApi',
 				{
@@ -78,7 +108,7 @@ export class TemplateOperations {
 			);
 
 			return {
-				json: TemplateOperations.parseResponse(response),
+				json: TemplateOperations.parseResponse(response) as IDataObject,
 				pairedItem: {
 					item: i,
 					input: 0,
@@ -94,13 +124,23 @@ export class TemplateOperations {
 		i: number,
 	): Promise<INodeExecutionData> {
 		const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
-		const credentials = (await this.getCredentials('carboneApi')) as any;
+		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
 
 		// Valider les données binaires
 		this.helpers.assertBinaryData(i, binaryPropertyName);
 
 		// Récupérer les informations du fichier binaire
-		const binaryData = this.getInputData()[i].binary as any;
+		const binaryData = this.getInputData()[i].binary;
+		if (!binaryData) {
+			throw new NodeOperationError(
+				this.getNode(),
+				'No binary data found',
+				{
+					description: 'Please ensure the binary data is properly configured in the previous node',
+					itemIndex: i,
+				},
+			);
+		}
 		const binaryProperty = binaryData[binaryPropertyName];
 
 		if (!binaryProperty) {
@@ -122,7 +162,7 @@ export class TemplateOperations {
 			'templateUploadAdditionalOptions',
 			i,
 			{},
-		) as any;
+		) as TemplateUploadOptions;
 		const versioning =
 			templateUploadAdditionalOptions.versioning !== undefined
 				? templateUploadAdditionalOptions.versioning
@@ -132,10 +172,8 @@ export class TemplateOperations {
 		const comment = templateUploadAdditionalOptions.comment || '';
 		const deployedAt = templateUploadAdditionalOptions.deployedAt || '';
 
-		// Préparer le formulaire multipart
-		// The 'versioning' field must be sent before the 'template' file field
-		// The 'id' field must be sent before the 'template' file field if provided
-		const formData: any = {};
+		// Préparer le FormData pour multipart/form-data
+		const formData: IDataObject = {};
 
 		// Add versioning first as required by the API
 		formData.versioning = versioning ? 'true' : 'false';
@@ -174,7 +212,9 @@ export class TemplateOperations {
 		}
 
 		try {
-			// Faire la requête d'upload using modern authentication helper
+			// Using requestWithAuthentication because it's the only method that supports formData
+			// without requiring external dependencies (n8n Cloud compatibility requirement)
+			// eslint-disable-next-line @n8n/community-nodes/no-deprecated-workflow-functions
 			const response = await this.helpers.requestWithAuthentication.call(
 				this,
 				'carboneApi',
@@ -186,7 +226,7 @@ export class TemplateOperations {
 			);
 
 			return {
-				json: TemplateOperations.parseResponse(response),
+				json: TemplateOperations.parseResponse(response) as IDataObject,
 				pairedItem: {
 					item: i,
 					input: 0,
@@ -202,10 +242,10 @@ export class TemplateOperations {
 		i: number,
 	): Promise<INodeExecutionData> {
 		const templateId = this.getNodeParameter('templateId', i) as string;
-		const credentials = (await this.getCredentials('carboneApi')) as any;
+		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
 
 		try {
-			const response = await this.helpers.requestWithAuthentication.call(
+			const response = await this.helpers.httpRequestWithAuthentication.call(
 				this,
 				'carboneApi',
 				{
@@ -215,7 +255,7 @@ export class TemplateOperations {
 			);
 
 			return {
-				json: TemplateOperations.parseResponse(response),
+				json: TemplateOperations.parseResponse(response) as IDataObject,
 				pairedItem: {
 					item: i,
 					input: 0,

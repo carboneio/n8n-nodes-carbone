@@ -6,6 +6,7 @@ import {
 	NodeConnectionType,
 	NodeOperationError,
 	NodeApiError,
+	JsonObject,
 } from 'n8n-workflow';
 import {
 	resource,
@@ -24,7 +25,7 @@ export class Carbone implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Carbone',
 		name: 'carbone',
-		icon: { light: 'file:carbone.svg', dark: 'file:carbone.svg' },
+		icon: { light: 'file:carbone.svg', dark: 'file:carbone-dark.svg' },
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
@@ -144,9 +145,9 @@ export class Carbone implements INodeType {
 				// Handle different types of errors appropriately
 				if (error && typeof error === 'object' && 'httpCode' in error) {
 					// This is an API error
-					throw new NodeApiError(this.getNode(), error as any, {
+					throw new NodeApiError(this.getNode(), error as JsonObject, {
 						message: 'API Error',
-						description: error.message || 'An unexpected error occurred with the Carbone API.',
+						description: (error as Error).message || 'An unexpected error occurred with the Carbone API.',
 					});
 				} else {
 					// This is an operational error

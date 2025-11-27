@@ -1,13 +1,33 @@
-import { IExecuteFunctions, INodeExecutionData, NodeOperationError } from 'n8n-workflow';
+import { IExecuteFunctions, INodeExecutionData, NodeOperationError, IDataObject } from 'n8n-workflow';
 import { CarboneErrorHandler } from '../../utils/errorHandler';
 
+interface CarboneCredentials {
+	apiKey: string;
+	apiUrl: string;
+	carboneVersion: string;
+}
+
+interface GenerateOptions {
+	timezone?: string;
+	lang?: string;
+	complement?: unknown;
+	variableStr?: string;
+	reportName?: string;
+	enum?: unknown;
+	translations?: unknown;
+	currencySource?: string;
+	currencyTarget?: string;
+	currencyRates?: unknown;
+	hardRefresh?: boolean;
+}
+
 export class RenderOperations {
-	private static parseResponse(response: any): any {
+	private static parseResponse(response: unknown): unknown {
 		// Parser la réponse JSON si c'est une chaîne pour éviter le double encodage
 		if (typeof response === 'string') {
 			try {
 				return JSON.parse(response);
-			} catch (error) {
+			} catch {
 				// Si le parsing échoue, utiliser la réponse originale
 				return response;
 			}
@@ -33,9 +53,9 @@ export class RenderOperations {
 		let data = this.getNodeParameter('data', i);
 		const convertTo = this.getNodeParameter('convertTo', i, 'pdf') as string;
 		const download = this.getNodeParameter('download', i, false) as boolean;
-		const additionalOptions = this.getNodeParameter('generateAdditionalOptions', i, {}) as any;
+		const additionalOptions = this.getNodeParameter('generateAdditionalOptions', i, {}) as GenerateOptions;
 
-		const credentials = (await this.getCredentials('carboneApi')) as any;
+		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
 
 		// Gérer le parsing JSON pour les deux formats: string et objet
 		if (typeof data === 'string') {
@@ -53,7 +73,7 @@ export class RenderOperations {
 			}
 		}
 
-		const requestBody: any = { data };
+		const requestBody: Record<string, unknown> = { data };
 
 		// Ajouter convertTo si spécifié
 		if (convertTo) {
@@ -90,27 +110,28 @@ export class RenderOperations {
 		}
 
 		try {
-			const response = await this.helpers.requestWithAuthentication.call(
-				this,
-				'carboneApi',
-				{
-					method: 'POST',
-					url: apiUrl,
-					qs: {
-						download: download ? 'true' : undefined,
-					},
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: requestBody,
-					encoding: download ? null : undefined,
-					resolveWithFullResponse: download,
-				},
-			);
-
 			if (download) {
+				// Pour le téléchargement, utiliser returnFullResponse: true
+				const response = await this.helpers.httpRequestWithAuthentication.call(
+					this,
+					'carboneApi',
+					{
+						method: 'POST',
+						url: apiUrl,
+						qs: {
+							download: 'true',
+						},
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: requestBody,
+						returnFullResponse: true,
+						encoding: 'arraybuffer',
+					},
+				);
+
 				// Extraire le nom du fichier depuis Content-Disposition
-				const contentDisposition = response.headers['content-disposition'] || '';
+				const contentDisposition = (response.headers as IDataObject)['content-disposition'] as string || '';
 				let fileName = 'document'; // fallback par défaut
 
 				const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
@@ -119,15 +140,16 @@ export class RenderOperations {
 				}
 
 				// Laisser n8n gérer le content-type automatiquement
+				const buffer = response.body as ArrayBuffer;
 				const binaryData = {
-					[fileName]: await this.helpers.prepareBinaryData(response.body, fileName),
+					[fileName]: await this.helpers.prepareBinaryData(buffer, fileName),
 				};
 
 				return {
 					json: {
 						success: true,
 						fileName,
-						size: response.body.length,
+						size: (response.body as ArrayBuffer).byteLength,
 					},
 					binary: binaryData,
 					pairedItem: {
@@ -136,8 +158,21 @@ export class RenderOperations {
 					},
 				};
 			} else {
+				const response = await this.helpers.httpRequestWithAuthentication.call(
+					this,
+					'carboneApi',
+					{
+						method: 'POST',
+						url: apiUrl,
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: requestBody,
+					},
+				);
+
 				return {
-					json: RenderOperations.parseResponse(response),
+					json: RenderOperations.parseResponse(response) as IDataObject,
 					pairedItem: {
 						item: i,
 						input: 0,
@@ -154,22 +189,22 @@ export class RenderOperations {
 		i: number,
 	): Promise<INodeExecutionData> {
 		const renderId = this.getNodeParameter('renderId', i) as string;
-		const credentials = (await this.getCredentials('carboneApi')) as any;
+		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
 
 		try {
-			const response = await this.helpers.requestWithAuthentication.call(
+			const response = await this.helpers.httpRequestWithAuthentication.call(
 				this,
 				'carboneApi',
 				{
 					method: 'GET',
 					url: `${credentials.apiUrl}/render/${renderId}`,
-					encoding: null, // Important pour obtenir les données binaires
-					resolveWithFullResponse: true,
+					returnFullResponse: true,
+					encoding: 'arraybuffer',
 				},
 			);
 
 			// Extraire le nom du fichier depuis Content-Disposition
-			const contentDisposition = response.headers['content-disposition'] || '';
+			const contentDisposition = (response.headers as IDataObject)['content-disposition'] as string || '';
 			let fileName = 'document'; // fallback par défaut
 
 			const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
@@ -178,8 +213,9 @@ export class RenderOperations {
 			}
 
 			// Laisser n8n gérer le content-type automatiquement
+			const buffer = response.body as ArrayBuffer;
 			const binaryData = {
-				[fileName]: await this.helpers.prepareBinaryData(response.body, fileName),
+				[fileName]: await this.helpers.prepareBinaryData(buffer, fileName),
 			};
 
 			return {
@@ -187,7 +223,7 @@ export class RenderOperations {
 					success: true,
 					renderId,
 					fileName,
-					size: response.body.length,
+					size: (response.body as ArrayBuffer).byteLength,
 				},
 				binary: binaryData,
 				pairedItem: {
