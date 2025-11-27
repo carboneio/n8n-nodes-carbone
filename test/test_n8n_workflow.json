@@ -1,0 +1,543 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        16,
+        384
+      ],
+      "id": "f9a5a28d-df8e-46d5-8720-5606e8869e59",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/Users/vlebert/n8n-nodes/n8n/template_v1.docx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        240,
+        112
+      ],
+      "id": "aab7de79-c458-48f1-aec6-f57d3e385263",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "templateId": {
+          "__rl": true,
+          "value": "={{ $json.data.versionId }}",
+          "mode": "id"
+        },
+        "data": "={{ {\"Title\": \"Voila le titre\",\n\"Subtitle\": \"Voila le sous titre\"}\n}}",
+        "generateAdditionalOptions": {},
+        "additionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        688,
+        624
+      ],
+      "id": "46672541-124b-4056-8244-47bc9d3e11db",
+      "name": "Generate document",
+      "credentials": {
+        "carboneApi": {
+          "id": "YzRPXyrIw1stNLNh",
+          "name": "Carbone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "operation": "get",
+        "renderId": "={{ $json.data.renderId }}",
+        "additionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        912,
+        624
+      ],
+      "id": "3611c700-cc86-402e-92bc-319a8002319a",
+      "name": "Get generated document",
+      "credentials": {
+        "carboneApi": {
+          "id": "YzRPXyrIw1stNLNh",
+          "name": "Carbone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "includeVersions": true,
+        "additionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        240,
+        1008
+      ],
+      "id": "c1057a8d-8966-43e3-8d54-070a5eddee09",
+      "name": "List templates",
+      "credentials": {
+        "carboneApi": {
+          "id": "YzRPXyrIw1stNLNh",
+          "name": "Carbone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        464,
+        1008
+      ],
+      "id": "c311fc87-90db-4db2-91a0-95d367563e83",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "templateId": "={{ $json.versionId }}",
+        "additionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        688,
+        1008
+      ],
+      "id": "39614be1-a5be-455c-8d56-c7ee7ef1d224",
+      "name": "Delete template",
+      "credentials": {
+        "carboneApi": {
+          "id": "YzRPXyrIw1stNLNh",
+          "name": "Carbone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fileSelector": "/Users/vlebert/n8n-nodes/n8n/template_v2.docx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        240,
+        528
+      ],
+      "id": "0ea50d75-40a6-47e1-aaa4-22e114df154e",
+      "name": "Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        688,
+        192
+      ],
+      "id": "09f71c43-cd1b-4524-9e2b-fcc1f1972f66",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "templateUploadAdditionalOptions": {
+          "name": "toto"
+        },
+        "additionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        464,
+        112
+      ],
+      "id": "1e1198f7-dcd5-44e0-8cea-423c344a9e0b",
+      "name": "Upload template1",
+      "credentials": {
+        "carboneApi": {
+          "id": "YzRPXyrIw1stNLNh",
+          "name": "Carbone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "templateUploadAdditionalOptions": {
+          "deployedAt": "2025-08-11T00:00:00"
+        },
+        "additionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        464,
+        544
+      ],
+      "id": "aa2263fd-524a-490b-81d2-103d5aa190d0",
+      "name": "Upload template2",
+      "credentials": {
+        "carboneApi": {
+          "id": "YzRPXyrIw1stNLNh",
+          "name": "Carbone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.carbone.website/templates",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "carboneApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        -80
+      ],
+      "id": "79824f8d-b7e2-4b5d-a7f4-ef2fe6f7bf27",
+      "name": "HTTP Request",
+      "credentials": {
+        "carboneApi": {
+          "id": "YzRPXyrIw1stNLNh",
+          "name": "Carbone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "id": "ed23a668-ff29-47b7-b8f1-9c7a5714d419",
+      "name": "To B64",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        464,
+        816
+      ]
+    },
+    {
+      "parameters": {
+        "templateUploadAdditionalOptions": {
+          "id": "={{ $json.data.id }}"
+        },
+        "additionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        912,
+        192
+      ],
+      "id": "d9b61a51-4602-454e-b023-ddcb5f2267d6",
+      "name": "Update template1",
+      "credentials": {
+        "carboneApi": {
+          "id": "YzRPXyrIw1stNLNh",
+          "name": "Carbone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "templateId": {
+          "__rl": true,
+          "value": "={{ $json.data.versionId }}",
+          "mode": "id"
+        },
+        "data": "{\"Title\": \"Voila le titre\",\n\"Subtitle\": \"Voila le sous titre\"}",
+        "convertTo": "docx",
+        "download": true,
+        "generateAdditionalOptions": {},
+        "additionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        688,
+        432
+      ],
+      "id": "c4cb83e4-030b-4e0b-aa5d-e99fe508c1cf",
+      "name": "Generate download=true",
+      "credentials": {
+        "carboneApi": {
+          "id": "YzRPXyrIw1stNLNh",
+          "name": "Carbone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "templateSource": true,
+        "templateBase64": "={{ $json.data }}",
+        "data": "={{ {\"Title\": \"Voila le titre\",\n\"Subtitle\": \"Voila le sous titre\"}\n}}",
+        "download": true,
+        "generateAdditionalOptions": {},
+        "additionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        688,
+        816
+      ],
+      "id": "e7dd2778-d7b7-47cf-893f-60bd838762fe",
+      "name": "Generate with base64 template",
+      "credentials": {
+        "carboneApi": {
+          "id": "YzRPXyrIw1stNLNh",
+          "name": "Carbone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.carbone.website/render/template?download=true",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "carboneApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ \n\n{\n \n   \"template\":$json.data, \n   \"data\":{}, \n   \"convertTo\": \"pdf\"\n} \n\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1104,
+        992
+      ],
+      "id": "cd0b21c6-655d-4692-9c05-6d4fb6eeb403",
+      "name": "HTTP Request1",
+      "credentials": {
+        "carboneApi": {
+          "id": "YzRPXyrIw1stNLNh",
+          "name": "Carbone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "templateId": {
+          "__rl": true,
+          "value": "1241802582583985089",
+          "mode": "list",
+          "cachedResultName": "1241802582583985089 - 1241802582583985089"
+        },
+        "generateAdditionalOptions": {},
+        "additionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        416
+      ],
+      "id": "f60366a7-e457-4080-8e14-5f440f60f198",
+      "name": "Generate document1",
+      "credentials": {
+        "carboneApi": {
+          "id": "YzRPXyrIw1stNLNh",
+          "name": "Carbone account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "List templates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Upload template1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate document": {
+      "main": [
+        [
+          {
+            "node": "Get generated document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List templates": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Delete template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Upload template2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "To B64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload template1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Update template1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload template2": {
+      "main": [
+        [
+          {
+            "node": "Generate document",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate download=true",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "To B64": {
+      "main": [
+        [
+          {
+            "node": "Generate with base64 template",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate with base64 template": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9cf95d31-acb7-48cf-9beb-35efa8378485",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cca4c12f21b3a2fc63a33a9b11245fdc274982ddf3e1493089ab94763c371f10"
+  },
+  "id": "cSTO14QycnVYJb1G",
+  "tags": []
+}
