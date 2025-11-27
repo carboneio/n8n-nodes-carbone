@@ -172,56 +172,46 @@ export class TemplateOperations {
 		const comment = templateUploadAdditionalOptions.comment || '';
 		const deployedAt = templateUploadAdditionalOptions.deployedAt || '';
 
-		// Préparer le FormData pour multipart/form-data
-		const formData: IDataObject = {};
+		// Create native FormData instance (available in Node.js 18+)
+		const formData = new FormData();
 
 		// Add versioning first as required by the API
-		formData.versioning = versioning ? 'true' : 'false';
+		formData.append('versioning', versioning ? 'true' : 'false');
 
 		// Add id if not empty (must be sent before the template field)
 		if (id) {
-			formData.id = id;
+			formData.append('id', id);
 		}
 
-		// Add template file
-		formData.template = {
-			value: fileBuffer,
-			options: {
-				filename: fileName,
-				contentType: 'application/octet-stream',
-			},
-		};
+		// Add template file as Blob
+		const blob = new Blob([fileBuffer], { type: 'application/octet-stream' });
+		formData.append('template', blob, fileName);
 
 		// Add other optional parameters (only if not empty)
 		if (name) {
-			formData.name = name;
+			formData.append('name', name);
 		}
 		if (comment) {
-			formData.comment = comment;
+			formData.append('comment', comment);
 		}
 		if (deployedAt) {
 			// Convert ISO string to Unix timestamp if needed
-			if (
-				typeof deployedAt === 'string' &&
+			const timestamp = typeof deployedAt === 'string' &&
 				/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(deployedAt)
-			) {
-				formData.deployedAt = TemplateOperations.convertIsoToUnixTimestamp(deployedAt);
-			} else {
-				formData.deployedAt = deployedAt;
-			}
+				? TemplateOperations.convertIsoToUnixTimestamp(deployedAt)
+				: deployedAt;
+			formData.append('deployedAt', timestamp);
 		}
 
 		try {
-			// Using requestWithAuthentication because httpRequestWithAuthentication doesn't support
-			// the formData option format needed for multipart/form-data without external dependencies
-			// eslint-disable-next-line @n8n/community-nodes/no-deprecated-workflow-functions
-			const response = await this.helpers.requestWithAuthentication.call(
+			// Use httpRequestWithAuthentication with native FormData (Node.js 18+)
+			const response = await this.helpers.httpRequestWithAuthentication.call(
 				this,
 				'carboneApi',
 				{
 					method: 'POST',
 					url: `${credentials.apiUrl}/template`,
-					formData: formData,
+					body: formData,
 				},
 			);
 
