@@ -212,8 +212,8 @@ export class TemplateOperations {
 		}
 
 		try {
-			// Using requestWithAuthentication because it's the only method that supports formData
-			// without requiring external dependencies (n8n Cloud compatibility requirement)
+			// Using requestWithAuthentication because httpRequestWithAuthentication doesn't support
+			// the formData option format needed for multipart/form-data without external dependencies
 			// eslint-disable-next-line @n8n/community-nodes/no-deprecated-workflow-functions
 			const response = await this.helpers.requestWithAuthentication.call(
 				this,
