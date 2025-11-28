@@ -3,12 +3,14 @@ import {
 	ICredentialType,
 	INodeProperties,
 	ICredentialTestRequest,
+	Icon,
 } from 'n8n-workflow';
 
 export class CarboneApi implements ICredentialType {
 	name = 'carboneApi';
 	displayName = 'Carbone API';
 	documentationUrl = 'https://carbone.io/api-reference.html';
+	icon: Icon = 'file:../nodes/Carbone/carbone.svg';
 
 	properties: INodeProperties[] = [
 		{

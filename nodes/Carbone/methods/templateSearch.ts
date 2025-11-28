@@ -12,7 +12,7 @@ export async function templateSearch(
 	const credentials = await this.getCredentials('carboneApi');
 
 	try {
-		const response = await this.helpers.requestWithAuthentication.call(
+		const response = await this.helpers.httpRequestWithAuthentication.call(
 			this,
 			'carboneApi',
 			{
@@ -51,7 +51,7 @@ export async function templateSearch(
 			};
 		} else {
 			return {
-				results: templates.map((template: any) => {
+				results: templates.map((template: { id?: string; name?: string; versionId?: string }) => {
 					const templateId = template.id || 'unknown';
 					const templateName =
 						typeof template.name === 'string' && template.name.trim().length > 0
@@ -68,7 +68,7 @@ export async function templateSearch(
 				}),
 			};
 		}
-	} catch (error) {
+	} catch {
 		throw new NodeOperationError(this.getNode(), 'Failed to fetch templates from Carbone API', {
 			level: 'warning',
 		});
