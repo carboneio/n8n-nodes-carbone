@@ -149,15 +149,18 @@ Tested with:
 
 ## Version history
 
+### 1.2.0
+- Removed all `requestWithAuthentication` calls with `httpRequestWithAuthentication`.
+
 ### 1.1.0
-- Removed redundant routing configurations from operation descriptions
-- Replaced all `helpers.request()` calls with `this.helpers.httpRequestWithAuthentication()`
-- Translate French error messages to English
+- Removed redundant routing configurations from operation descriptions.
+- Replaced all `helpers.request()` calls with `this.helpers.httpRequestWithAuthentication()`.
+- Translate French error messages to English.
 
 
 ### 1.0.0
-- Initial release
-- Template management operations: List, Upload, Delete
-- Document rendering operations: Generate, Get
-- Advanced options for document generation (localization, currency, etc.)
-- Support for both template ID and base64 template approaches
+- Initial release.
+- Template management operations: List, Upload, Delete.
+- Document rendering operations: Generate, Get.
+- Advanced options for document generation (localization, currency, etc.).
+- Support for both template ID and base64 template approaches.
