@@ -151,6 +151,7 @@ Tested with:
 
 ### 1.2.0
 - Removed all `requestWithAuthentication` calls with `httpRequestWithAuthentication`.
+- Using now n8n-node-cli to lint/build/release
 
 ### 1.1.0
 - Removed redundant routing configurations from operation descriptions.
