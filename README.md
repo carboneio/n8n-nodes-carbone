@@ -149,6 +149,9 @@ Tested with:
 
 ## Version history
 
+### 1.2.1
+- Removed the empty "Additional Options" collection from all action.
+
 ### 1.2.0
 - Removed all `requestWithAuthentication` calls with `httpRequestWithAuthentication`.
 - Using now n8n-node-cli to lint/build/release

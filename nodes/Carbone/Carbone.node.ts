@@ -15,7 +15,6 @@ import {
 	templateUploadAdditionalOptions,
 	renderOperations,
 	renderFields,
-	additionalOptions,
 } from './CarboneDescription';
 import { TemplateOperations } from './resources/Template/TemplateOperations';
 import { RenderOperations } from './resources/RenderDocument/RenderOperations';
@@ -58,9 +57,6 @@ export class Carbone implements INodeType {
 			...templateFields,
 			...renderFields,
 			...templateUploadAdditionalOptions,
-
-			// Additional Options (masquées par défaut)
-			...additionalOptions,
 		],
 	};
 

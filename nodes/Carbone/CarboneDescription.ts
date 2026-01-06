@@ -27,18 +27,6 @@ export const resource: INodeProperties[] = [
 	},
 ];
 
-// Additional Options (masquées par défaut)
-export const additionalOptions: INodeProperties[] = [
-	{
-		displayName: 'Additional Options',
-		name: 'additionalOptions',
-		type: 'collection',
-		placeholder: 'Add Option',
-		default: {},
-		options: [],
-	},
-];
-
 // Re-export all the imported constants
 export {
 	templateOperations,
