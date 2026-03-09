@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-carbone",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "n8n node for Carbone.io services - template management and document generation. Easily integrate the generation of PDF, DOCX, XLS, XLSX, ODT, PPTX, ODS, CSV and XML reports and documents into your applications, using data from your existing JSON APIs. The easy-to-implement template concept frees you from design constraints, with a No/Low code approach.",
   "keywords": [
     "n8n-community-node-package",
@@ -27,12 +27,17 @@
   ],
   "license": "MIT",
   "homepage": "https://github.com/carboneio/n8n-nodes-carbone",
-  "author": { "name": "Carbone.io", "email": "contact@carbone.io" },
+  "author": {
+    "name": "Carbone.io",
+    "email": "contact@carbone.io"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/carboneio/n8n-nodes-carbone"
   },
-  "engines": { "node": ">=20.15" },
+  "engines": {
+    "node": ">=20.15"
+  },
   "main": "index.js",
   "scripts": {
     "build": "n8n-node build",
@@ -43,11 +48,17 @@
     "prepublishOnly": "n8n-node prerelease",
     "release": "n8n-node release"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "n8n": {
     "n8nNodesApiVersion": 1,
-    "credentials": ["dist/credentials/CarboneApi.credentials.js"],
-    "nodes": ["dist/nodes/Carbone/Carbone.node.js"],
+    "credentials": [
+      "dist/credentials/CarboneApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/Carbone/Carbone.node.js"
+    ],
     "strict": true
   },
   "devDependencies": {
@@ -57,5 +68,7 @@
     "prettier": "^3.8.1",
     "typescript": "^5.9.3"
   },
-  "peerDependencies": { "n8n-workflow": "*" }
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
 }
