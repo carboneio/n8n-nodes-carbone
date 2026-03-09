@@ -3,8 +3,15 @@ import {
 	templateOperations,
 	templateFields,
 	templateUploadAdditionalOptions,
+	uploadTemplateIdField,
+	uploadCategoryField,
+	updateCategoryField,
+	listCategoryField,
+	uploadTagsField,
+	updateTagsField,
 } from './resources/Template/TemplateDescription';
 import { renderOperations, renderFields } from './resources/RenderDocument/RenderDescription';
+import { convertOperations, convertFields } from './resources/ConvertDocument/ConvertDescription';
 
 // Resource unifiée
 export const resource: INodeProperties[] = [
@@ -15,12 +22,16 @@ export const resource: INodeProperties[] = [
 		noDataExpression: true,
 		options: [
 			{
-				name: 'Template',
-				value: 'template',
+				name: 'Convert Document',
+				value: 'convertDocument',
 			},
 			{
 				name: 'Render Document',
 				value: 'renderDocument',
+			},
+			{
+				name: 'Template',
+				value: 'template',
 			},
 		],
 		default: 'template',
@@ -32,6 +43,14 @@ export {
 	templateOperations,
 	templateFields,
 	templateUploadAdditionalOptions,
+	uploadTemplateIdField,
+	uploadCategoryField,
+	updateCategoryField,
+	listCategoryField,
+	uploadTagsField,
+	updateTagsField,
 	renderOperations,
 	renderFields,
+	convertOperations,
+	convertFields,
 };

@@ -3,7 +3,6 @@ import {
 	INodeExecutionData,
 	INodeType,
 	INodeTypeDescription,
-	NodeConnectionType,
 	NodeOperationError,
 	NodeApiError,
 	JsonObject,
@@ -13,12 +12,23 @@ import {
 	templateOperations,
 	templateFields,
 	templateUploadAdditionalOptions,
+	uploadTemplateIdField,
+	uploadCategoryField,
+	updateCategoryField,
+	listCategoryField,
+	uploadTagsField,
+	updateTagsField,
 	renderOperations,
 	renderFields,
+	convertOperations,
+	convertFields,
 } from './CarboneDescription';
 import { TemplateOperations } from './resources/Template/TemplateOperations';
 import { RenderOperations } from './resources/RenderDocument/RenderOperations';
+import { ConvertOperations } from './resources/ConvertDocument/ConvertOperations';
 import { templateSearch } from './methods/templateSearch';
+import { loadCategories } from './methods/loadCategories';
+import { loadTags } from './methods/loadTags';
 
 export class Carbone implements INodeType {
 	description: INodeTypeDescription = {
@@ -32,8 +42,8 @@ export class Carbone implements INodeType {
 		defaults: {
 			name: 'Carbone',
 		},
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: ['main'],
+		outputs: ['main'],
 		usableAsTool: true,
 		credentials: [
 			{
@@ -46,15 +56,22 @@ export class Carbone implements INodeType {
 			url: '',
 			headers: {
 				Accept: 'application/json',
-				'Content-Type': 'application/json',
 			},
 		},
 		properties: [
 			// Resource unifiée
 			...resource,
+			...convertOperations,
 			...templateOperations,
 			...renderOperations,
+			...convertFields,
 			...templateFields,
+			...uploadTemplateIdField,
+			...uploadCategoryField,
+			...updateCategoryField,
+			...listCategoryField,
+			...uploadTagsField,
+			...updateTagsField,
 			...renderFields,
 			...templateUploadAdditionalOptions,
 		],
@@ -63,6 +80,10 @@ export class Carbone implements INodeType {
 	methods = {
 		listSearch: {
 			templateSearch,
+		},
+		loadOptions: {
+			loadCategories,
+			loadTags,
 		},
 	};
 
@@ -73,6 +94,7 @@ export class Carbone implements INodeType {
 		// Initialize operation handlers
 		const templateOps = new TemplateOperations();
 		const renderOps = new RenderOperations();
+		const convertOps = new ConvertOperations();
 
 		for (let i = 0; i < items.length; i++) {
 			const resource = this.getNodeParameter('resource', i) as string;
@@ -83,14 +105,30 @@ export class Carbone implements INodeType {
 
 				if (resource === 'template') {
 					if (operation === 'list') {
-						// Template List Operation
 						result = await templateOps.listTemplates.call(this, i);
+					} else if (operation === 'listCategories') {
+						result = await templateOps.listCategories.call(this, i);
+					} else if (operation === 'listTags') {
+						result = await templateOps.listTags.call(this, i);
 					} else if (operation === 'upload') {
-						// Template Upload Operation
 						result = await templateOps.uploadTemplate.call(this, i);
+					} else if (operation === 'update') {
+						result = await templateOps.updateTemplate.call(this, i);
+					} else if (operation === 'download') {
+						result = await templateOps.downloadTemplate.call(this, i);
 					} else if (operation === 'delete') {
-						// Template Delete Operation
 						result = await templateOps.deleteTemplate.call(this, i);
+					} else {
+						throw new NodeOperationError(
+							this.getNode(),
+							`Operation ${operation} on resource ${resource} is not implemented`,
+						);
+					}
+				} else if (resource === 'convertDocument') {
+					if (operation === 'convertHtmlToPdf') {
+						result = await convertOps.convertHtmlToPdf.call(this, i);
+					} else if (operation === 'convertOfficeToPdf') {
+						result = await convertOps.convertOfficeToPdf.call(this, i);
 					} else {
 						throw new NodeOperationError(
 							this.getNode(),
@@ -111,10 +149,7 @@ export class Carbone implements INodeType {
 						);
 					}
 				} else {
-					throw new NodeOperationError(
-						this.getNode(),
-						`Resource ${resource} is not implemented`,
-					);
+					throw new NodeOperationError(this.getNode(), `Resource ${resource} is not implemented`);
 				}
 
 				returnData.push(result);
@@ -143,7 +178,8 @@ export class Carbone implements INodeType {
 					// This is an API error
 					throw new NodeApiError(this.getNode(), error as JsonObject, {
 						message: 'API Error',
-						description: (error as Error).message || 'An unexpected error occurred with the Carbone API.',
+						description:
+							(error as Error).message || 'An unexpected error occurred with the Carbone API.',
 					});
 				} else {
 					// This is an operational error

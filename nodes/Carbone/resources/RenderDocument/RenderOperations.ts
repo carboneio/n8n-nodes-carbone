@@ -1,4 +1,9 @@
-import { IExecuteFunctions, INodeExecutionData, NodeOperationError, IDataObject } from 'n8n-workflow';
+import {
+	IExecuteFunctions,
+	INodeExecutionData,
+	NodeOperationError,
+	IDataObject,
+} from 'n8n-workflow';
 import { CarboneErrorHandler } from '../../utils/errorHandler';
 
 interface CarboneCredentials {
@@ -19,6 +24,9 @@ interface GenerateOptions {
 	currencyTarget?: string;
 	currencyRates?: unknown;
 	hardRefresh?: boolean;
+	batchSplitBy?: string;
+	batchOutput?: string;
+	webhookUrl?: string;
 }
 
 export class RenderOperations {
@@ -35,10 +43,7 @@ export class RenderOperations {
 		return response;
 	}
 
-	async generateDocument(
-		this: IExecuteFunctions,
-		i: number,
-	): Promise<INodeExecutionData> {
+	async generateDocument(this: IExecuteFunctions, i: number): Promise<INodeExecutionData> {
 		const templateSource = this.getNodeParameter('templateSource', i) as boolean;
 		let templateId: string | undefined;
 		let templateBase64: string | undefined;
@@ -51,9 +56,14 @@ export class RenderOperations {
 			templateBase64 = this.getNodeParameter('templateBase64', i) as string;
 		}
 		let data = this.getNodeParameter('data', i);
-		const convertTo = this.getNodeParameter('convertTo', i, 'pdf') as string;
-		const download = this.getNodeParameter('download', i, false) as boolean;
-		const additionalOptions = this.getNodeParameter('generateAdditionalOptions', i, {}) as GenerateOptions;
+		const convertTo = this.getNodeParameter('convertTo', i, '') as string;
+		const converter = this.getNodeParameter('converter', i, '') as string;
+		const returnRenderId = this.getNodeParameter('returnRenderId', i, false) as boolean;
+		const additionalOptions = this.getNodeParameter(
+			'generateAdditionalOptions',
+			i,
+			{},
+		) as GenerateOptions;
 
 		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
 
@@ -62,14 +72,10 @@ export class RenderOperations {
 			try {
 				data = JSON.parse(data);
 			} catch (error) {
-				throw new NodeOperationError(
-					this.getNode(),
-					`Invalid JSON data: ${error.message}`,
-					{
-						description: 'The data parameter must be valid JSON. Please check your JSON syntax.',
-						itemIndex: i,
-					},
-				);
+				throw new NodeOperationError(this.getNode(), `Invalid JSON data: ${error.message}`, {
+					description: 'The data parameter must be valid JSON. Please check your JSON syntax.',
+					itemIndex: i,
+				});
 			}
 		}
 
@@ -78,6 +84,10 @@ export class RenderOperations {
 		// Ajouter convertTo si spécifié
 		if (convertTo) {
 			requestBody.convertTo = convertTo;
+		}
+
+		if (converter) {
+			requestBody.converter = converter;
 		}
 
 		// Ajouter les options supplémentaires
@@ -96,6 +106,8 @@ export class RenderOperations {
 			if (additionalOptions.currencyRates)
 				requestBody.currencyRates = additionalOptions.currencyRates;
 			if (additionalOptions.hardRefresh) requestBody.hardRefresh = additionalOptions.hardRefresh;
+			if (additionalOptions.batchSplitBy) requestBody.batchSplitBy = additionalOptions.batchSplitBy;
+			if (additionalOptions.batchOutput) requestBody.batchOutput = additionalOptions.batchOutput;
 		}
 
 		// Construire l'URL en fonction de la source du template
@@ -109,29 +121,28 @@ export class RenderOperations {
 			apiUrl = `${credentials.apiUrl}/render/${templateId}`;
 		}
 
+		const webhookUrl = additionalOptions?.webhookUrl;
+
 		try {
-			if (download) {
-				// Pour le téléchargement, utiliser returnFullResponse: true
-				const response = await this.helpers.httpRequestWithAuthentication.call(
-					this,
-					'carboneApi',
-					{
-						method: 'POST',
-						url: apiUrl,
-						qs: {
-							download: 'true',
-						},
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: requestBody,
-						returnFullResponse: true,
-						encoding: 'arraybuffer',
+			if (!returnRenderId && !webhookUrl) {
+				// Download the file directly (?download=true)
+				const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+					method: 'POST',
+					url: apiUrl,
+					qs: {
+						download: 'true',
 					},
-				);
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: requestBody,
+					returnFullResponse: true,
+					encoding: 'arraybuffer',
+				});
 
 				// Extraire le nom du fichier depuis Content-Disposition
-				const contentDisposition = (response.headers as IDataObject)['content-disposition'] as string || '';
+				const contentDisposition =
+					((response.headers as IDataObject)['content-disposition'] as string) || '';
 				let fileName = 'document'; // fallback par défaut
 
 				const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
@@ -140,9 +151,9 @@ export class RenderOperations {
 				}
 
 				// Laisser n8n gérer le content-type automatiquement
-				const buffer = response.body as ArrayBuffer;
+				const buffer = response.body as unknown as Buffer;
 				const binaryData = {
-					[fileName]: await this.helpers.prepareBinaryData(buffer, fileName),
+					data: await this.helpers.prepareBinaryData(buffer, fileName),
 				};
 
 				return {
@@ -158,18 +169,17 @@ export class RenderOperations {
 					},
 				};
 			} else {
-				const response = await this.helpers.httpRequestWithAuthentication.call(
-					this,
-					'carboneApi',
-					{
-						method: 'POST',
-						url: apiUrl,
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: requestBody,
-					},
-				);
+				const headers: IDataObject = { 'Content-Type': 'application/json' };
+				if (webhookUrl) {
+					headers['carbone-webhook-url'] = webhookUrl;
+				}
+
+				const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+					method: 'POST',
+					url: apiUrl,
+					headers,
+					body: requestBody,
+				});
 
 				return {
 					json: RenderOperations.parseResponse(response) as IDataObject,
@@ -184,27 +194,21 @@ export class RenderOperations {
 		}
 	}
 
-	async getDocument(
-		this: IExecuteFunctions,
-		i: number,
-	): Promise<INodeExecutionData> {
+	async getDocument(this: IExecuteFunctions, i: number): Promise<INodeExecutionData> {
 		const renderId = this.getNodeParameter('renderId', i) as string;
 		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
 
 		try {
-			const response = await this.helpers.httpRequestWithAuthentication.call(
-				this,
-				'carboneApi',
-				{
-					method: 'GET',
-					url: `${credentials.apiUrl}/render/${renderId}`,
-					returnFullResponse: true,
-					encoding: 'arraybuffer',
-				},
-			);
+			const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+				method: 'GET',
+				url: `${credentials.apiUrl}/render/${renderId}`,
+				returnFullResponse: true,
+				encoding: 'arraybuffer',
+			});
 
 			// Extraire le nom du fichier depuis Content-Disposition
-			const contentDisposition = (response.headers as IDataObject)['content-disposition'] as string || '';
+			const contentDisposition =
+				((response.headers as IDataObject)['content-disposition'] as string) || '';
 			let fileName = 'document'; // fallback par défaut
 
 			const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
@@ -213,9 +217,9 @@ export class RenderOperations {
 			}
 
 			// Laisser n8n gérer le content-type automatiquement
-			const buffer = response.body as ArrayBuffer;
+			const buffer = response.body as unknown as Buffer;
 			const binaryData = {
-				[fileName]: await this.helpers.prepareBinaryData(buffer, fileName),
+				data: await this.helpers.prepareBinaryData(buffer, fileName),
 			};
 
 			return {

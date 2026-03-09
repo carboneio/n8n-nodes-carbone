@@ -1,0 +1,531 @@
+{
+  "name": "Test_Workflow_HTML_to_PDF",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        160
+      ],
+      "id": "953bb79b-35b7-46e3-b9fb-fa4bc3e05867",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "081550af-a8a0-4d37-9edc-c84143de5d62",
+              "leftValue": "={{ $json.fileName }}",
+              "rightValue": "=report.pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "70962857-36ed-4791-ac4a-1a01d4bb6d81",
+              "leftValue": "={{ $json.size }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "b9412b05-559e-4df0-8131-36e7c72a363b",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        512,
+        0
+      ],
+      "id": "a8722a0d-086d-450d-a586-51031682b3a4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "081550af-a8a0-4d37-9edc-c84143de5d62",
+              "leftValue": "={{ $json.fileName }}",
+              "rightValue": "=report.pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "70962857-36ed-4791-ac4a-1a01d4bb6d81",
+              "leftValue": "={{ $json.size }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "b9412b05-559e-4df0-8131-36e7c72a363b",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        528,
+        224
+      ],
+      "id": "7c935025-0803-46de-a8d6-fce46887db89",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "resource": "convertDocument",
+        "htmlUrl": "https://carbone.io"
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        304,
+        0
+      ],
+      "id": "1555fde6-a397-41f5-9e26-b0525edb5591",
+      "name": "Convert HTML to PDF from URL",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "convertDocument",
+        "htmlSource": "templateId",
+        "templateId": {
+          "__rl": true,
+          "value": "1370233913120394050",
+          "mode": "list",
+          "cachedResultName": "Service Agreement HTML - 1370233913120394050 - 253dab825f9349ee0bf2c33447579faebffb952c8f3a400079e7d2c07d7088ac"
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        320,
+        224
+      ],
+      "id": "0a39409e-1b83-433b-a9da-a99ad8ba8760",
+      "name": "Convert HTML to PDF from Template Studio",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "081550af-a8a0-4d37-9edc-c84143de5d62",
+              "leftValue": "={{ $json.fileName }}",
+              "rightValue": "=report.pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "70962857-36ed-4791-ac4a-1a01d4bb6d81",
+              "leftValue": "={{ $json.size }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "b9412b05-559e-4df0-8131-36e7c72a363b",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        544,
+        448
+      ],
+      "id": "ff7c9bb0-761c-461e-8ff3-8cc53747eda4",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "resource": "convertDocument",
+        "htmlSource": "rawHtml",
+        "rawHtml": " <!DOCTYPE html>\n <html>\n    <head>\n        <title>Welcome Email </title>\n    </head>\n    <body>\n        <h1>Welcome, {d.user.firstName} {d.user.lastName}! </h1>\n        <p>Thank you for registering with us. </p>\n        <p>Your email address is: {d.user.email} </p>\n        <p>Your membership level: {d.membershipLevel} </p>\n    </body>\n </html>"
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        320,
+        448
+      ],
+      "id": "77c3754e-564d-4d83-8aa1-fdb4020ac999",
+      "name": "Convert HTML to PDF from Raw HTML",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        992,
+        208
+      ],
+      "id": "c5198846-fff5-4a0c-9974-9c030c6c69b2",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "resource": "convertDocument",
+        "htmlSource": "file"
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        544,
+        672
+      ],
+      "id": "e2694638-ed4a-40da-b37a-64266cd0521f",
+      "name": "Convert HTML to PDF From N8N File",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "search": "Service Agreement HTML"
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        112,
+        672
+      ],
+      "id": "b3ead0d5-ae96-4269-939e-c04c46f40086",
+      "name": "List templates",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "templateId": {
+          "__rl": true,
+          "value": "={{ $json.data[0].id }}",
+          "mode": "id"
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        320,
+        672
+      ],
+      "id": "e2e4987d-1e18-4b96-9b26-8f8b0b66f3b9",
+      "name": "Download template",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "081550af-a8a0-4d37-9edc-c84143de5d62",
+              "leftValue": "={{ $json.fileName }}",
+              "rightValue": "=report.pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "70962857-36ed-4791-ac4a-1a01d4bb6d81",
+              "leftValue": "={{ $json.size }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "b9412b05-559e-4df0-8131-36e7c72a363b",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        752,
+        656
+      ],
+      "id": "9f0547d8-a68a-4e71-8ac0-39b29057399d",
+      "name": "If3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Convert HTML to PDF from URL",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Convert HTML to PDF from Template Studio",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Convert HTML to PDF from Raw HTML",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "List templates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert HTML to PDF from URL": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert HTML to PDF from Template Studio": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert HTML to PDF from Raw HTML": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List templates": {
+      "main": [
+        [
+          {
+            "node": "Download template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download template": {
+      "main": [
+        [
+          {
+            "node": "Convert HTML to PDF From N8N File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert HTML to PDF From N8N File": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "06f9baa8-41a6-4505-9886-83d783be7f68",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8d09110c494d29132e717e2d8cdba9566bb09d4ab3e8c75ec241c4473351904b"
+  },
+  "id": "WDZ7Y5u9AdycJ3gF",
+  "tags": [
+    {
+      "updatedAt": "2026-03-08T14:45:52.590Z",
+      "createdAt": "2026-03-08T14:45:52.590Z",
+      "id": "9e75H4yMC691FPHM",
+      "name": "e2e-tests"
+    }
+  ]
+}

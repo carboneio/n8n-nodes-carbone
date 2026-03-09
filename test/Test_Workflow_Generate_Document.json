@@ -1,0 +1,828 @@
+{
+  "name": "Test_Workflow_Generate_Document",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        784
+      ],
+      "id": "5d7e1de9-aed2-485c-9e8d-b075d3c774a0",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        1008
+      ],
+      "id": "3ddfbf8e-8ff5-42b3-93ed-c35c7853fa82",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "content": "### Generate Document\nTemplate Upload: base64\nDownload: Render ID to Download the document",
+        "height": 256,
+        "width": 432
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        768
+      ],
+      "typeVersion": 1,
+      "id": "9f916067-cfbf-40f4-9791-1dcb4f5f091f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "### Generate Document\nTemplate Upload: base64\nDownload: direct download",
+        "height": 288,
+        "width": 256,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        1040
+      ],
+      "typeVersion": 1,
+      "id": "7d10777c-eafa-45e3-8b44-0b0695b97f4f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "27bb04bb-3e92-4184-bd70-a4f3a66522ff",
+              "leftValue": "={{ $json.fileName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "995d5753-0aef-4be5-ae85-569d6f350d1a",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        1152
+      ],
+      "id": "afc23eb4-931c-48c7-a9ca-481d52edfd69",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Generation failed!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        512,
+        1232
+      ],
+      "id": "9e724575-f279-4e46-b4a9-248523ea9e4d",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "27bb04bb-3e92-4184-bd70-a4f3a66522ff",
+              "leftValue": "={{ $json.fileName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "995d5753-0aef-4be5-ae85-569d6f350d1a",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        880
+      ],
+      "id": "a7d83638-bc33-4cef-9ce4-40ab7393f60a",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Generation failed!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        608,
+        960
+      ],
+      "id": "da1be374-6d15-46f9-b4b0-52b618f890a1",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "27bb04bb-3e92-4184-bd70-a4f3a66522ff",
+              "leftValue": "={{ $json.fileName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "995d5753-0aef-4be5-ae85-569d6f350d1a",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        592
+      ],
+      "id": "285e6443-ea69-40ae-ba0f-a2f87060f308",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Generation failed!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        608,
+        608
+      ],
+      "id": "56c01ef1-64f4-47ed-93ec-f580c849ee99",
+      "name": "Stop and Error2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "27bb04bb-3e92-4184-bd70-a4f3a66522ff",
+              "leftValue": "={{ $json.fileName }}",
+              "rightValue": "test-custom-document-name.pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "995d5753-0aef-4be5-ae85-569d6f350d1a",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        336
+      ],
+      "id": "25ab5b01-4ccc-439a-a669-49811512998d",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Generation failed!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        624,
+        336
+      ],
+      "id": "688140c6-40a2-4c39-9a9c-1ab11dd72883",
+      "name": "Stop and Error3"
+    },
+    {
+      "parameters": {
+        "content": "### Generate Document\nTemplate Access: Template ID\nDownload: Render ID to Download the document",
+        "height": 256,
+        "width": 736,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        496
+      ],
+      "typeVersion": 1,
+      "id": "1f663561-ed21-4adf-b200-2eebc044d045",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "### Generate Document\nTemplate Access: Template ID\nDownload: Direct Download\nConvertTo: PDF\nConverter: OnlyOffice\nreportName: custom",
+        "height": 224,
+        "width": 736,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        256
+      ],
+      "typeVersion": 1,
+      "id": "edb57626-1608-48da-8666-42f240e5fcf3",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "templateId": {
+          "__rl": true,
+          "value": "={{ $json.data[0].id }}",
+          "mode": "id"
+        },
+        "convertTo": "pdf",
+        "converter": "O",
+        "generateAdditionalOptions": {
+          "reportName": "test-custom-document-name"
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        224,
+        336
+      ],
+      "id": "e62f346f-41a9-4cb2-9993-3ed7a010ad2b",
+      "name": "Generate document2",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "templateId": {
+          "__rl": true,
+          "value": "1261313065510878624",
+          "mode": "list",
+          "cachedResultName": "Invoice Template - 1261313065510878624 - 51fbe60487da02f2a9b6ecfeb33320f53ca88c16ddc365c085c51aa4b448ca61"
+        },
+        "returnRenderId": true,
+        "generateAdditionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        48,
+        608
+      ],
+      "id": "a0e0d3e3-6608-42af-8afc-21cdfe8c8903",
+      "name": "Generate document3",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "operation": "get",
+        "renderId": "={{ $json.data.renderId }}"
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        256,
+        592
+      ],
+      "id": "0215437c-d09e-4cc5-bb78-6c7122ae7851",
+      "name": "Download generated document",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "templateSource": true,
+        "templateBase64": "={{ $json.data }}",
+        "returnRenderId": true,
+        "generateAdditionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        48,
+        880
+      ],
+      "id": "8d629ec3-b09b-4448-9af4-81cb0c3797a1",
+      "name": "Generate document",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "operation": "get",
+        "renderId": "={{ $json.data.renderId }}"
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        240,
+        880
+      ],
+      "id": "d9edf576-7a28-4936-9c60-64c230bf0665",
+      "name": "Download generated document1",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "templateSource": true,
+        "templateBase64": "={{ $json.data }}",
+        "generateAdditionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        64,
+        1168
+      ],
+      "id": "45bde75d-4147-44fe-b2e2-987383c06adf",
+      "name": "Generate document1",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "search": "Invoice Template"
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        352
+      ],
+      "id": "0725e320-ffca-458e-ac86-e85a58ee89f8",
+      "name": "List templates",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "templateId": {
+          "__rl": true,
+          "value": "1261313065510878624",
+          "mode": "list",
+          "cachedResultName": "Invoice Template - 1261313065510878624 - 51fbe60487da02f2a9b6ecfeb33320f53ca88c16ddc365c085c51aa4b448ca61"
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        992
+      ],
+      "id": "b33034ce-7d1d-41bc-80ad-7dc1a0c51659",
+      "name": "Download template",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### Generate Document Webhook!\nTemplate Upload: base64\nDownload: should return a JSON",
+        "height": 288,
+        "width": 256,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        16,
+        1360
+      ],
+      "typeVersion": 1,
+      "id": "7113dfab-72c1-4398-a97a-37b3d426afe6",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "templateSource": true,
+        "templateBase64": "={{ $json.data }}",
+        "generateAdditionalOptions": {
+          "webhookUrl": "https://test-n8n.carbone.io"
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        80,
+        1504
+      ],
+      "id": "a8556171-f5e3-4749-af46-2130bb26f7c3",
+      "name": "Generate document4",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "27bb04bb-3e92-4184-bd70-a4f3a66522ff",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "A render ID will be sent to your callback URL when the document is generated",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "995d5753-0aef-4be5-ae85-569d6f350d1a",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        1504
+      ],
+      "id": "475cfb37-8ed2-4614-87fe-b05920bf88b0",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Generation failed!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        480,
+        1584
+      ],
+      "id": "2e043311-1040-435e-b574-2ad18b75bd2a",
+      "name": "Stop and Error4"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Generate document3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "List templates",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Download template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Generate document",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate document1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate document4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate document2": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate document3": {
+      "main": [
+        [
+          {
+            "node": "Download generated document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download generated document": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate document": {
+      "main": [
+        [
+          {
+            "node": "Download generated document1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download generated document1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate document1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List templates": {
+      "main": [
+        [
+          {
+            "node": "Generate document2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download template": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate document4": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "95b71b06-3229-45ab-9603-e90dac227f95",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8d09110c494d29132e717e2d8cdba9566bb09d4ab3e8c75ec241c4473351904b"
+  },
+  "id": "pzLAkdqfnffG2gWM",
+  "tags": [
+    {
+      "updatedAt": "2026-03-08T14:45:52.590Z",
+      "createdAt": "2026-03-08T14:45:52.590Z",
+      "id": "9e75H4yMC691FPHM",
+      "name": "e2e-tests"
+    }
+  ]
+}

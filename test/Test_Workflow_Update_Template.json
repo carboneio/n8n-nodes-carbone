@@ -1,0 +1,375 @@
+{
+  "name": "Test_Workflow_Update_Template",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "91aaabb3-a1e0-4585-90ef-798866ce5815",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "templateId": {
+          "__rl": true,
+          "value": "={{ $json.data.versionId }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "comment": "=Comment From Update / {{ $now.format(('yyyy-MM-dd')) }}",
+          "expireAt": "={{ DateTime.now().plus({ days: 5 }).startOf('day').toUTC().toISO() }}",
+          "name": "=Service Agreement Update / {{ $now.format(('yyyy-MM-dd')) }}"
+        },
+        "category": "={{ \"New Folder from Update\" }}",
+        "tags": "={{ [\"tag-update1\", \"tag-update2\"] }}"
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        672,
+        0
+      ],
+      "id": "55b68557-6308-40c9-b155-7ff39d1739f9",
+      "name": "Update template",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "uploadTemplateId": {
+          "__rl": true,
+          "value": "1370233913120394050",
+          "mode": "list",
+          "cachedResultName": "Service Agreement HTML - 1370233913120394050 - 253dab825f9349ee0bf2c33447579faebffb952c8f3a400079e7d2c07d7088ac"
+        },
+        "templateUploadAdditionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "4a22292e-0bc4-4c09-8348-2ba29a443f6f",
+      "name": "Upload template - Duplicate existing version",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "templateId": {
+          "__rl": true,
+          "value": "1370233913120394050",
+          "mode": "list",
+          "cachedResultName": "Service Agreement HTML - 1370233913120394050 - 253dab825f9349ee0bf2c33447579faebffb952c8f3a400079e7d2c07d7088ac"
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "f1a78956-02ac-4a3c-a82e-50f3bece8c15",
+      "name": "Download template",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Setup\n\n",
+        "height": 272,
+        "width": 448
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -112
+      ],
+      "id": "3ea37e88-64f7-4911-91bf-38a6340559ed",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Tests\n- expireAt\n- COmment\n- tag\n- category\n- name\n\n",
+        "height": 336,
+        "width": 192
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        608,
+        -176
+      ],
+      "id": "2888a096-4dee-4028-9874-a6999590efe7",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "versionId": "={{ $json.data.versionId }}",
+        "includeVersions": true
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        880,
+        0
+      ],
+      "id": "6307095f-ede5-4e04-9191-23217c458da8",
+      "name": "List templates",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "35a3db03-5b1a-41e4-b313-9641874eeb13",
+              "leftValue": "={{ $json.data[0].tags[0] }}",
+              "rightValue": "tag-update1",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "36e1492f-fe52-4b77-b665-c5ace1ff0075",
+              "leftValue": "={{ $json.data[0].tags[1] }}",
+              "rightValue": "tag-update2",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "2748abc8-e5ce-41c9-8f43-80a5d139ebc1",
+              "leftValue": "={{ $json.data[0].category }}",
+              "rightValue": "New Folder from Update",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "a6b926a4-79d2-43d7-918a-893b033ac5e8",
+              "leftValue": "={{ $json.data[0].comment }}",
+              "rightValue": "Comment From Update",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "bc3bd4ad-6c5e-4afb-92bf-f03028b8d737",
+              "leftValue": "={{ $json.data[0].name }}",
+              "rightValue": "Service Agreement Update",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "4877bce9-118c-4e41-acd4-862289c386ee",
+              "leftValue": "={{ $json.data[0].expireAt.toDateTime().format('yyyy-MM-dd') }}",
+              "rightValue": "={{ DateTime.now().plus({ days: 5 }).startOf('day').toUTC().toISO() }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1088,
+        0
+      ],
+      "id": "839e9577-8dd7-4a58-a191-da8f315511b7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Error"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        16
+      ],
+      "id": "7d2a79d3-c414-40ff-badb-cfc620cc9d77",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "templateId": {
+          "__rl": true,
+          "value": "={{ $('Upload template - Duplicate existing version').item.json.data.versionId }}",
+          "mode": "id"
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        -96
+      ],
+      "id": "9ede62b0-92db-4cec-835d-ca97d1c33680",
+      "name": "Delete template",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Check and Clean\n\n",
+        "height": 256,
+        "width": 768
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -112
+      ],
+      "id": "241ce5cc-74e5-48d8-aee8-3a00cd431a8a",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload template - Duplicate existing version": {
+      "main": [
+        [
+          {
+            "node": "Update template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download template": {
+      "main": [
+        [
+          {
+            "node": "Upload template - Duplicate existing version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update template": {
+      "main": [
+        [
+          {
+            "node": "List templates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List templates": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Delete template",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c62d2375-873c-4d8e-8443-bc6af3b0414d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8d09110c494d29132e717e2d8cdba9566bb09d4ab3e8c75ec241c4473351904b"
+  },
+  "id": "0JPvigy7yIEtb4Gf",
+  "tags": [
+    {
+      "updatedAt": "2026-03-08T14:45:52.590Z",
+      "createdAt": "2026-03-08T14:45:52.590Z",
+      "id": "9e75H4yMC691FPHM",
+      "name": "e2e-tests"
+    }
+  ]
+}
