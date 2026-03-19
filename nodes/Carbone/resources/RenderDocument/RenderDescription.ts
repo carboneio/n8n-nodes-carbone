@@ -33,17 +33,35 @@ export const renderOperations: INodeProperties[] = [
 // Render Document Fields
 export const generateOperation: INodeProperties[] = [
 	{
-		displayName: 'Use Inline Template File (Base64)',
+		displayName: 'Template Source',
 		name: 'templateSource',
-		type: 'boolean',
-		default: false,
-		description: 'Whether to provide a template file directly as a base64-encoded string instead of selecting a stored template',
+		type: 'options',
+		noDataExpression: true,
+		default: 'templateId',
+		description: 'Where the template comes from',
 		displayOptions: {
 			show: {
 				resource: ['renderDocument'],
 				operation: ['generate'],
 			},
 		},
+		options: [
+			{
+				name: 'File',
+				value: 'file',
+				description: 'Use a template file from a previous node (DOCX, XLSX, PPTX, ODT, HTML…)',
+			},
+			{
+				name: 'Base64 String',
+				value: 'base64',
+				description: 'Provide the template as a base64-encoded string',
+			},
+			{
+				name: 'Template ID',
+				value: 'templateId',
+				description: 'Use a template stored on Carbone. Select from the list or enter an ID.',
+			},
+		],
 	},
 	{
 		displayName: 'Template ID',
@@ -56,7 +74,7 @@ export const generateOperation: INodeProperties[] = [
 			show: {
 				resource: ['renderDocument'],
 				operation: ['generate'],
-				templateSource: [false],
+				templateSource: ['templateId'],
 			},
 		},
 		modes: [
@@ -78,17 +96,34 @@ export const generateOperation: INodeProperties[] = [
 		],
 	},
 	{
-		displayName: 'Template File (Base64)',
-		name: 'templateBase64',
+		displayName: 'Binary Property Name',
+		name: 'binaryPropertyName',
 		type: 'string',
 		required: true,
-		default: '',
-		description: 'The template file encoded as base64 string',
+		default: 'data',
+		description:
+			'The template file to use for document generation. Supported formats: DOCX, XLSX, PPTX, ODT, ODS, ODP, ODG, HTML.',
+		hint: 'Enter the name of the binary field from the previous node (e.g. data, file, attachment_0)',
 		displayOptions: {
 			show: {
 				resource: ['renderDocument'],
 				operation: ['generate'],
-				templateSource: [true],
+				templateSource: ['file'],
+			},
+		},
+	},
+	{
+		displayName: 'Template (Base64)',
+		name: 'templateBase64',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'The template file encoded as a base64 string',
+		displayOptions: {
+			show: {
+				resource: ['renderDocument'],
+				operation: ['generate'],
+				templateSource: ['base64'],
 			},
 		},
 	},

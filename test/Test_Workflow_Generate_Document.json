@@ -396,7 +396,7 @@
     {
       "parameters": {
         "resource": "renderDocument",
-        "templateSource": true,
+        "templateSource": "base64",
         "templateBase64": "={{ $json.data }}",
         "returnRenderId": true,
         "generateAdditionalOptions": {}
@@ -440,7 +440,7 @@
     {
       "parameters": {
         "resource": "renderDocument",
-        "templateSource": true,
+        "templateSource": "base64",
         "templateBase64": "={{ $json.data }}",
         "generateAdditionalOptions": {}
       },
@@ -523,7 +523,7 @@
     {
       "parameters": {
         "resource": "renderDocument",
-        "templateSource": true,
+        "templateSource": "base64",
         "templateBase64": "={{ $json.data }}",
         "generateAdditionalOptions": {
           "webhookUrl": "https://test-n8n.carbone.io"
@@ -599,6 +599,132 @@
       ],
       "id": "2e043311-1040-435e-b574-2ad18b75bd2a",
       "name": "Stop and Error4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "27bb04bb-3e92-4184-bd70-a4f3a66522ff",
+              "leftValue": "={{ $json.fileName }}",
+              "rightValue": "report.pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "995d5753-0aef-4be5-ae85-569d6f350d1a",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "7de6e021-9238-47c3-89b2-f6b0d58aef3b",
+              "leftValue": "={{ $json.size }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        1808
+      ],
+      "id": "5fbbffa9-b6ce-42dd-82d2-6bde8308ac12",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Generation failed!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        688,
+        1856
+      ],
+      "id": "29964606-1ec4-4fd9-aa54-8f4566da7c48",
+      "name": "Stop and Error5"
+    },
+    {
+      "parameters": {
+        "content": "### Generate Document from a Template as N8N File\nReturn a RENDER ID",
+        "height": 288,
+        "width": 432,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        16,
+        1680
+      ],
+      "typeVersion": 1,
+      "id": "b284a202-9189-4070-beef-cbbe80ca76e0",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "templateSource": "file",
+        "data": "{\n  \"invoiceId\": \"FR-2023-781\",\n  \"invoiceDate\": \"2023-01-17\",\n  \"name\": \"Timmoty Johnson\",\n  \"phone\": \"+33 (0)2 23 12 33 24\",\n  \"email\": \"tim+serverpro@carbone.io\",\n  \"partner\": {\n    \"name\": \"Charles Nonneau\",\n    \"phone\": \"+33 (0)6 27 89 01 23\",\n    \"email\": \"contact@cloudtech.io\",\n    \"vat\": \"FR45899106785\",\n    \"siren\": \"899106785\",\n    \"address\": {\n      \"street\": \"12 Doctor Street\",\n      \"postalcode\": 34920,\n      \"city\": \"Anger\",\n      \"country\": \"France\"\n    }\n  },\n  \"note\": \"Our team is confident that <b>this cutting-edge technology</b> will enhance your operations and take your business to the next level. Should you have any questions or concerns, please don't hesitate to reach out to us.\",\n  \"subscriptionFromDate\": \"2023-02-02T07:28:05+00:00\",\n  \"subscriptionToDate\": \"2024-04-18T07:28:05+00:00\",\n  \"products\": [\n    {\n      \"name\": \"<b>Rackmount case</b> (With bays for multiple 3.5-inch drives and room for the motherboard and other components.)\",\n      \"exTaxTotal\": 500,\n      \"unit\": 500,\n      \"vat\": 20,\n      \"qty\": 1\n    },\n    {\n      \"name\": \"<b>Motherboard</b> (has the necessary number of SATA ports for your storage needs)\",\n      \"exTaxTotal\": 150,\n      \"unit\": 150,\n      \"vat\": 20,\n      \"qty\": 1\n    },\n    {\n      \"name\": \"<b>3.5-inch SATA hard drives</b> (20TO)\",\n      \"exTaxTotal\": 1000,\n      \"unit\": 100,\n      \"vat\": 20,\n      \"qty\": 10\n    },\n    {\n      \"name\": \"<b>Processor</b> ( A low-power consumption processor)\",\n      \"exTaxTotal\": 100,\n      \"unit\": 100,\n      \"vat\": 20,\n      \"qty\": 1\n    },\n    {\n      \"name\": \"<b>4GB DDR5 RAM</b>\",\n      \"exTaxTotal\": 120,\n      \"unit\": 30,\n      \"vat\": 20,\n      \"qty\": 4\n    }\n  ],\n  \"exTaxTotal\": 1870,\n  \"taxTotal\": 374,\n  \"inTaxTotal\": 2244,\n  \"amountRemaining\": 1044,\n  \"invoicePaymentList\": [\n    {\n      \"paymentDate\": \"2023-02-03T07:28:05+00:00\",\n      \"typeSelect\": \"Paiement\",\n      \"amount\": 1200\n    }\n  ],\n  \"payment\": {\n    \"name\": \"SEPA Transfer\",\n    \"typeSelect\": \"SEPAtransfer\",\n    \"condition\": \"Upon receipt of invoice\",\n    \"bankLabel\": \"Revolut\",\n    \"bankBIC\": \"REVOGB2L\",\n    \"bankIBAN\": \"FR2112739000409352423869N75\"\n  }\n}",
+        "convertTo": "pdf",
+        "returnRenderId": true,
+        "generateAdditionalOptions": {}
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        80,
+        1792
+      ],
+      "id": "beaff0db-cdb1-4f42-bce5-884918dea717",
+      "name": "Generate document5",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "operation": "get",
+        "renderId": "={{ $json.data.renderId }}"
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [
+        304,
+        1792
+      ],
+      "id": "630f63a6-bd53-49af-8fa8-f00ca95c9c0b",
+      "name": "Download generated document2",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -777,6 +903,11 @@
             "node": "Extract from File",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Generate document5",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -803,6 +934,40 @@
           }
         ]
       ]
+    },
+    "If5": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate document5": {
+      "main": [
+        [
+          {
+            "node": "Download generated document2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download generated document2": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -811,7 +976,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "95b71b06-3229-45ab-9603-e90dac227f95",
+  "versionId": "62e51f2d-1ee4-45fb-a767-afc6cef20122",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "8d09110c494d29132e717e2d8cdba9566bb09d4ab3e8c75ec241c4473351904b"

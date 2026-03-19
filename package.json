@@ -23,7 +23,15 @@
     "fill-docx-templates",
     "fill-odt-templates",
     "automate-document-creation",
-    "bulk-document-generation"
+    "bulk-document-generation",
+    "document-conversion",
+    "html-to-pdf",
+    "office-to-pdf",
+    "convert-docx-to-pdf",
+    "convert-xlsx-to-pdf",
+    "convert-pptx-to-pdf",
+    "convert-html-to-pdf",
+    "convert-office-to-pdf"
   ],
   "license": "MIT",
   "homepage": "https://github.com/carboneio/n8n-nodes-carbone",

@@ -58,9 +58,13 @@ Convert an Office document (DOCX, XLSX, PPTX, ODT, ODS, ODP, ODG) to PDF.
 Generate a document by merging data into a template.
 
 **Parameters:**
-- **Use Inline Template File (Base64)**: Provide a template file directly as a base64-encoded string instead of selecting a stored template
-- **Template ID**: The template ID to use (when not using inline template)
-- **Template File (Base64)**: The template file encoded as base64 string (when using inline template)
+- **Template Source**: Where the template comes from — three options:
+  - **Template ID** *(default)*: Use a template stored on Carbone. Select from the autocomplete list or enter an ID manually.
+  - **File**: Use a template file from a previous node (DOCX, XLSX, PPTX, ODT, HTML…). Provide the binary property name. The node encodes it to base64 automatically.
+  - **Base64 String**: Provide the template as a base64-encoded string directly.
+- **Template ID**: The template ID to use (when Template Source is "Template ID")
+- **Binary Property Name**: The binary field from the previous node that contains the template file (when Template Source is "File")
+- **Template (Base64)**: The template file encoded as a base64 string (when Template Source is "Base64 String")
 - **Data**: Data merged into the template. Accessible via `{d.}` tags (e.g. `{d.firstName}`)
 - **Convert To**: Convert the document into another format. Defaults to the template's native format. Supported: PDF, DOCX, XLSX, ODT, ODS, ODP, PPTX, PPT, DOC, CSV, HTML, XML, RTF, TXT, SVG, PNG, JPG, GIF, TIFF, WEBP, EPUB, IDML, Markdown, and more
 - **Converter**: PDF rendering engine — shown only when "Convert To" is set to PDF. `LibreOffice` (default, best for ODT/ODS/ODP), `OnlyOffice` (best for DOCX/XLSX/PPTX), `Chromium` (best for HTML)
@@ -212,6 +216,17 @@ Tested with:
 * [Carbone.io Template Guide](https://carbone.io/documentation/design/overview/getting-started.html)
 
 ## Version history
+
+### 2.0.0
+
+**⚠️ Breaking change — Generate Document: Template Source**
+
+The `Use Inline Template File (Base64)` boolean toggle has been replaced by a `Template Source` selector with three options:
+- **Template ID** *(default)*: Use a stored Carbone template — same as before
+- **File** *(new)*: Connect any node that outputs a binary file directly — no manual base64 encoding needed
+- **Base64 String**: Provide an inline base64 string — same as the old `true` toggle
+
+**Migration:** select "Base64 String" to restore the previous behavior. Select "File" to remove the manual encoding step from your workflows.
 
 ### 1.3.0
 

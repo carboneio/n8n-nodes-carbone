@@ -58,6 +58,9 @@
       - Body `data`: JSON dataset requis pour le rendu
       - Body `convertTo`: Format de conversion (pdf, docx, xlsx, ods, csv, txt, odp, ppt, pptx, jpg, png, odt, doc, html, xml, idml, epub)
       - Body `template`: string - Template en base64 requis
+    - Used when `templateSource` is `'file'` or `'base64'`
+    - `'file'`: binary read via `assertBinaryData` + `getBinaryDataBuffer` → `.toString('base64')`
+    - `'base64'`: user-provided base64 string passed directly
   - `GET /render/{renderId}` - Retrieve generated document (file stream)
 
 - **Asynchronous rendering** (`webhookUrl` additional option):

@@ -30,6 +30,16 @@ interface GenerateOptions {
 }
 
 export class RenderOperations {
+	private async readBinaryAsBase64(
+		this: IExecuteFunctions,
+		i: number,
+		binaryPropertyName: string,
+	): Promise<string> {
+		this.helpers.assertBinaryData(i, binaryPropertyName);
+		const fileBuffer = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
+		return fileBuffer.toString('base64');
+	}
+
 	private static parseResponse(response: unknown): unknown {
 		// Parser la réponse JSON si c'est une chaîne pour éviter le double encodage
 		if (typeof response === 'string') {
@@ -44,14 +54,18 @@ export class RenderOperations {
 	}
 
 	async generateDocument(this: IExecuteFunctions, i: number): Promise<INodeExecutionData> {
-		const templateSource = this.getNodeParameter('templateSource', i) as boolean;
+		const templateSource = this.getNodeParameter('templateSource', i) as string;
+		const ops = new RenderOperations();
 		let templateId: string | undefined;
 		let templateBase64: string | undefined;
 
-		if (!templateSource) {
+		if (templateSource === 'templateId') {
 			templateId = this.getNodeParameter('templateId', i, undefined, {
 				extractValue: true,
 			}) as string;
+		} else if (templateSource === 'file') {
+			const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
+			templateBase64 = await ops.readBinaryAsBase64.call(this, i, binaryPropertyName);
 		} else {
 			templateBase64 = this.getNodeParameter('templateBase64', i) as string;
 		}
@@ -110,15 +124,13 @@ export class RenderOperations {
 			if (additionalOptions.batchOutput) requestBody.batchOutput = additionalOptions.batchOutput;
 		}
 
-		// Construire l'URL en fonction de la source du template
+		// Build URL and body based on template source
 		let apiUrl: string;
-		if (templateSource) {
-			// Ajouter le template base64 au corps de la requête
+		if (templateSource === 'templateId') {
+			apiUrl = `${credentials.apiUrl}/render/${templateId}`;
+		} else {
 			requestBody.template = templateBase64;
 			apiUrl = `${credentials.apiUrl}/render/template`;
-		} else {
-			// Utiliser le template ID dans l'URL
-			apiUrl = `${credentials.apiUrl}/render/${templateId}`;
 		}
 
 		const webhookUrl = additionalOptions?.webhookUrl;
