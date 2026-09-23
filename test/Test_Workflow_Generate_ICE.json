@@ -1,0 +1,259 @@
+{
+  "name": "Test_Workflow_Generate_ICE",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "id": "b2e1d3f5-0001-4d55-9404-17f2ab64d301",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "renderDocument",
+        "templateId": {
+          "__rl": true,
+          "value": "1261313065510878624",
+          "mode": "list",
+          "cachedResultName": "Invoice Template - 1261313065510878624 - 51fbe60487da02f2a9b6ecfeb33320f53ca88c16ddc365c085c51aa4b448ca61"
+        },
+        "convertTo": "pdf",
+        "converter": "I",
+        "generateAdditionalOptions": {
+          "reportName": "test-ice-generate"
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [208, -80],
+      "id": "b2e1d3f5-0002-4d55-9404-17f2ab64d302",
+      "name": "Generate PDF with Carbone ICE",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b2e1d3f5-0003-4534-b58c-abb61c8a6e01",
+              "leftValue": "={{ $json.fileName }}",
+              "rightValue": "test-ice-generate.pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "b2e1d3f5-0004-4534-b58c-abb61c8a6e02",
+              "leftValue": "={{ $json.size }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [416, -80],
+      "id": "b2e1d3f5-0005-4968-a368-97e6151e7401",
+      "name": "If ICE PDF generated"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "templateId": {
+          "__rl": true,
+          "value": "1261313065510878624",
+          "mode": "list",
+          "cachedResultName": "Invoice Template - 1261313065510878624 - 51fbe60487da02f2a9b6ecfeb33320f53ca88c16ddc365c085c51aa4b448ca61"
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [208, 128],
+      "id": "b2e1d3f5-0006-4d55-9404-17f2ab64d303",
+      "name": "Download template",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "convertDocument",
+        "operation": "convertOfficeToPdf",
+        "converter": "I"
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [416, 128],
+      "id": "b2e1d3f5-0007-4d55-9404-17f2ab64d304",
+      "name": "Convert Office to PDF with Carbone ICE",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b2e1d3f5-0008-4534-b58c-abb61c8a6e03",
+              "leftValue": "={{ $json.fileName }}",
+              "rightValue": "pdf",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              }
+            },
+            {
+              "id": "b2e1d3f5-0009-4534-b58c-abb61c8a6e04",
+              "leftValue": "={{ $json.size }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [624, 128],
+      "id": "b2e1d3f5-0010-4968-a368-97e6151e7402",
+      "name": "If ICE conversion succeeded"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Stop"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [864, 32],
+      "id": "b2e1d3f5-0011-4b26-a55e-c768c092dd01",
+      "name": "Stop and Error"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Generate PDF with Carbone ICE",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Download template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate PDF with Carbone ICE": {
+      "main": [
+        [
+          {
+            "node": "If ICE PDF generated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If ICE PDF generated": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download template": {
+      "main": [
+        [
+          {
+            "node": "Convert Office to PDF with Carbone ICE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Office to PDF with Carbone ICE": {
+      "main": [
+        [
+          {
+            "node": "If ICE conversion succeeded",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If ICE conversion succeeded": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": [
+    {
+      "id": "9e75H4yMC691FPHM",
+      "name": "e2e-tests"
+    }
+  ]
+}

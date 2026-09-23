@@ -5,6 +5,7 @@ import {
 	INodeTypeDescription,
 	NodeOperationError,
 	NodeApiError,
+	NodeConnectionTypes,
 	JsonObject,
 } from 'n8n-workflow';
 import {
@@ -42,8 +43,8 @@ export class Carbone implements INodeType {
 		defaults: {
 			name: 'Carbone',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		usableAsTool: true,
 		credentials: [
 			{
@@ -170,6 +171,7 @@ export class Carbone implements INodeType {
 
 				// Re-throw already properly formatted errors
 				if (error instanceof NodeOperationError || error instanceof NodeApiError) {
+					// eslint-disable-next-line @n8n/community-nodes/require-node-api-error -- error is already a NodeOperationError/NodeApiError
 					throw error;
 				}
 

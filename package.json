@@ -46,7 +46,6 @@
   "engines": {
     "node": ">=20.15"
   },
-  "main": "index.js",
   "scripts": {
     "build": "n8n-node build",
     "dev": "n8n-node dev",
@@ -54,7 +53,8 @@
     "lint": "n8n-node lint",
     "lintfix": "n8n-node lint --fix",
     "prepublishOnly": "n8n-node prerelease",
-    "release": "n8n-node release"
+    "release": "n8n-node release",
+    "test": "vitest run"
   },
   "files": [
     "dist"
@@ -70,11 +70,14 @@
     "strict": true
   },
   "devDependencies": {
-    "@n8n/node-cli": "^0.22.0",
-    "eslint": "^9.39.2",
-    "eslint-plugin-n8n-nodes-base": "^1.16.6",
-    "prettier": "^3.8.1",
-    "typescript": "^5.9.3"
+    "@n8n/node-cli": "^0.49.1",
+    "@types/node": "^26.6.2",
+    "@vitest/coverage-v8": "^5.0.1",
+    "eslint": "^9.39.5",
+    "eslint-plugin-n8n-nodes-base": "^1.16.7",
+    "prettier": "^3.9.9",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.1"
   },
   "peerDependencies": {
     "n8n-workflow": "*"

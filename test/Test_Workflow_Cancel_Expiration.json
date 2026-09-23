@@ -1,0 +1,255 @@
+{
+  "name": "Test_Workflow_Cancel_Expiration",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0],
+      "id": "c3f2e4a6-0001-4d55-9404-17f2ab64d401",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "templateId": {
+          "__rl": true,
+          "value": "1370233913120394050",
+          "mode": "list",
+          "cachedResultName": "Service Agreement HTML - 1370233913120394050 - 253dab825f9349ee0bf2c33447579faebffb952c8f3a400079e7d2c07d7088ac"
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [208, 0],
+      "id": "c3f2e4a6-0002-4d55-9404-17f2ab64d402",
+      "name": "Download template",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "uploadTemplateId": {
+          "__rl": true,
+          "value": "1370233913120394050",
+          "mode": "list",
+          "cachedResultName": "Service Agreement HTML - 1370233913120394050 - 253dab825f9349ee0bf2c33447579faebffb952c8f3a400079e7d2c07d7088ac"
+        },
+        "templateUploadAdditionalOptions": {
+          "expireAt": "={{ DateTime.now().plus({ days: 5 }).startOf('day').toUTC().toISO() }}",
+          "comment": "Version scheduled for deletion (cancel-expiration test)"
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [416, 0],
+      "id": "c3f2e4a6-0003-4d55-9404-17f2ab64d403",
+      "name": "Upload version with expiration",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "templateId": {
+          "__rl": true,
+          "value": "={{ $json.data.versionId }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "expireAt": ""
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [624, 0],
+      "id": "c3f2e4a6-0004-4d55-9404-17f2ab64d404",
+      "name": "Cancel scheduled deletion",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "list",
+        "versionId": "={{ $json.data.versionId }}",
+        "includeVersions": true
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [832, 0],
+      "id": "c3f2e4a6-0005-4d55-9404-17f2ab64d405",
+      "name": "List version",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c3f2e4a6-0006-4534-b58c-abb61c8a6f01",
+              "leftValue": "={{ $json.data[0].expireAt }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [1040, 0],
+      "id": "c3f2e4a6-0007-4968-a368-97e6151e7501",
+      "name": "If expiration cancelled"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "templateId": {
+          "__rl": true,
+          "value": "={{ $('Upload version with expiration').item.json.data.versionId }}",
+          "mode": "id"
+        }
+      },
+      "type": "CUSTOM.carbone",
+      "typeVersion": 1,
+      "position": [1248, -80],
+      "id": "c3f2e4a6-0008-4d55-9404-17f2ab64d406",
+      "name": "Delete test version",
+      "credentials": {
+        "carboneApi": {
+          "id": "W7ldNQYzDY7Wcg0j",
+          "name": "N8N Carbone Account Prod Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "errorMessage": "Stop"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [1248, 96],
+      "id": "c3f2e4a6-0009-4b26-a55e-c768c092de01",
+      "name": "Stop and Error"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Download template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download template": {
+      "main": [
+        [
+          {
+            "node": "Upload version with expiration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload version with expiration": {
+      "main": [
+        [
+          {
+            "node": "Cancel scheduled deletion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancel scheduled deletion": {
+      "main": [
+        [
+          {
+            "node": "List version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List version": {
+      "main": [
+        [
+          {
+            "node": "If expiration cancelled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If expiration cancelled": {
+      "main": [
+        [
+          {
+            "node": "Delete test version",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": [
+    {
+      "id": "9e75H4yMC691FPHM",
+      "name": "e2e-tests"
+    }
+  ]
+}

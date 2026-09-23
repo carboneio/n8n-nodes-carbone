@@ -1,16 +1,17 @@
 # n8n-nodes-carbone
 
-An n8n community node to automate document generation and conversion using [Carbone.io](https://carbone.io/) — directly from your n8n workflows.
+An n8n community node to automate document generation and conversion using [Carbone.io](https://carbone.io/) - directly from your n8n workflows.
 
 **What is Carbone.io?**
-Carbone.io is a document generation API that merges JSON data into templates (DOCX, XLSX, PPTX, ODT, HTML, and more) to produce professional documents in any format — PDF, DOCX, XLSX, CSV, PNG, and beyond. It uses a simple `{d.variableName}` tag syntax inside your existing Office or LibreOffice templates, with no design constraints and no proprietary editor.
+Carbone.io is a document generation API that merges JSON data into templates (DOCX, XLSX, PPTX, ODT, HTML, and more) to produce professional documents in any format - PDF, DOCX, XLSX, CSV, PNG, and beyond. It uses a simple `{d.variableName}` tag syntax inside your existing Office or LibreOffice templates, with no design constraints and no proprietary editor.
 
 **What this node does**
-- **Generate documents** — merge JSON data into a template and output a file in any supported format (PDF, DOCX, XLSX, ODT, PPTX, HTML, CSV, PNG, and more)
-- **Convert documents to PDF** — convert HTML pages or Office files (DOCX, XLSX, PPTX, ODT…) to PDF using Chromium, LibreOffice, or OnlyOffice
-- **Manage templates** — upload, update, delete, list, search, and download templates stored on Carbone.io; organize them with categories and tags
-- **Asynchronous generation** — trigger document generation via webhook for large or complex documents (up to 5 minutes)
-- **Batch generation** — generate one document per item in a JSON array, returned as a ZIP or merged PDF
+- **Generate documents** - merge JSON data into a template and output a file in any supported format (PDF, DOCX, XLSX, ODT, PPTX, HTML, CSV, PNG, and more)
+- **Convert documents to PDF** - convert HTML pages or Office files (DOCX, XLSX, PPTX, ODT…) to PDF using Carbone ICE, Chromium, LibreOffice, or OnlyOffice
+- **Secure and customize PDF output** - AES-256 encryption, open/permission passwords, text watermarks, PDF/A and PDF/UA compliance, image and CSV output options
+- **Manage templates** - upload, update, delete, list, search, and download templates stored on Carbone.io; organize them with categories and tags
+- **Asynchronous generation** - trigger document generation via webhook for large or complex documents (up to 5 minutes), with webhook authentication support
+- **Batch generation** - generate one document per item in a JSON array, returned as a ZIP or merged PDF
 
 **Common use cases**
 - Invoices, quotes, and receipts from billing data
@@ -21,7 +22,7 @@ Carbone.io is a document generation API that merges JSON data into templates (DO
 - Personalized letters and mass mail campaigns
 - Any document that combines a fixed layout with dynamic data
 
-**Supports Carbone API v4 and v5.**
+**Built for Carbone API v5** - works with Carbone Cloud and On-Premise instances.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
@@ -43,14 +44,14 @@ Convert an HTML document to PDF using the Chromium rendering engine for high-fid
 - **Raw HTML**: Paste or map your raw HTML code directly. To inject dynamic data, use the action "Generate a Document" instead.
 
 #### Convert Office to PDF
-Convert an Office document (DOCX, XLSX, PPTX, ODT, ODS, ODP, ODG) to PDF.
+Convert an Office document (DOCX, DOC, XLSX, XLS, PPTX, PPT, ODT, ODS, ODP, ODG, RTF, TXT, CSV, MD, IDML, XML) to PDF.
 
 **Office Source** (choose one):
-- **File**: Upload an Office document to convert to PDF. Supported formats: DOCX, XLSX, PPTX, ODT, ODS, ODP, ODG. To inject dynamic data, use the action "Generate a Document" instead.
+- **File**: Upload an Office document to convert to PDF. To inject dynamic data, use the action "Generate a Document" instead.
 - **Template ID**: Pick a static Office template stored on Carbone from the autocomplete list. To inject dynamic data using Carbone tags such as `{d.value}`, use the action "Generate a Document" instead.
 
 **Parameters:**
-- **Converter**: PDF rendering engine — `LibreOffice` (default, best for ODT/ODS/ODP) or `OnlyOffice` (best for DOCX/XLSX/PPTX)
+- **Converter**: PDF rendering engine - `Carbone ICE` (the fastest, for DOCX/ODT), `LibreOffice` (default, best for ODT/ODS/ODP) or `OnlyOffice` (best for XLSX/PPTX)
 
 ### Render Document
 
@@ -58,7 +59,7 @@ Convert an Office document (DOCX, XLSX, PPTX, ODT, ODS, ODP, ODG) to PDF.
 Generate a document by merging data into a template.
 
 **Parameters:**
-- **Template Source**: Where the template comes from — three options:
+- **Template Source**: Where the template comes from - three options:
   - **Template ID** *(default)*: Use a template stored on Carbone. Select from the autocomplete list or enter an ID manually.
   - **File**: Use a template file from a previous node (DOCX, XLSX, PPTX, ODT, HTML…). Provide the binary property name. The node encodes it to base64 automatically.
   - **Base64 String**: Provide the template as a base64-encoded string directly.
@@ -66,25 +67,34 @@ Generate a document by merging data into a template.
 - **Binary Property Name**: The binary field from the previous node that contains the template file (when Template Source is "File")
 - **Template (Base64)**: The template file encoded as a base64 string (when Template Source is "Base64 String")
 - **Data**: Data merged into the template. Accessible via `{d.}` tags (e.g. `{d.firstName}`)
-- **Convert To**: Convert the document into another format. Defaults to the template's native format. Supported: PDF, DOCX, XLSX, ODT, ODS, ODP, PPTX, PPT, DOC, CSV, HTML, XML, RTF, TXT, SVG, PNG, JPG, GIF, TIFF, WEBP, EPUB, IDML, Markdown, and more
-- **Converter**: PDF rendering engine — shown only when "Convert To" is set to PDF. `LibreOffice` (default, best for ODT/ODS/ODP), `OnlyOffice` (best for DOCX/XLSX/PPTX), `Chromium` (best for HTML)
+- **Convert To**: Convert the document into another format. Defaults to the template's native format. Supported: PDF, DOCX, XLSX, ODT, ODS, ODP, ODG, PPTX, PPT, DOC, CSV, HTML, XHTML, XML, RTF, TXT, SVG, PNG, JPG, GIF, BMP, TIFF, WEBP, EPUB, IDML, Markdown, and more
+- **Converter**: PDF rendering engine - shown only when "Convert To" is set to PDF. `Carbone ICE` (the fastest, for DOCX/ODT), `LibreOffice` (default, best for ODT/ODS/ODP), `OnlyOffice` (best for XLSX/PPTX), `Chromium` (best for HTML)
 - **Return Render ID**: When enabled, returns a Render ID instead of the file. Use the Render ID with "Download Document" to retrieve the file. The document is available for one hour and can be downloaded once.
 
+**Format Options** (shown when Convert To is PDF, JPG, PNG or CSV):
+- **PDF security** (all converters): `Encrypt File` (AES-256), `Document Open Password`, `Restrict Permissions`, `Permission Password`, `Printing Allowed`, `Changes Allowed`
+- **Watermarks** (all converters): up to 4 text watermarks with anchor, rotation, color, font, opacity, page range - supports `{#PAGE_NUMBER}` and `{#PAGE_TOTAL}`
+- **PDF output** (LibreOffice only): `PDF Version` (PDF/A-1 to PDF/A-4, PDF 1.5–2.0), `PDF/UA Compliance`, `Page Range`, image compression and resolution
+- **Image** (JPG/PNG): pixel size, quality, color mode, compression - **CSV**: field separator, text delimiter, character set
+
 **Document Generation Additional Options:**
-- **Batch Output**: Output format for batch processing — `zip` (individual files) or `pdf` (merged into one PDF)
-- **Batch Split By**: JSON path to an array in your data for batch document generation (e.g. `d.items` generates one document per item)
+- **Batch Output**: Output format for batch processing - `zip` (individual files) or `pdf` (merged into one PDF)
+- **Batch Report Name**: Name of each file inside the ZIP, Carbone tags accepted (e.g. `report-{d.id}`)
+- **Batch Split By**: JSON path to an array in your data (e.g. `d.items` generates one document per item). Requires "Webhook URL"; max 100 items on Carbone Cloud
 - **Complement**: Extra data merged into the template, accessible via `{c.}` tags (e.g. `{c.companyName}`)
-- **Currency Rates**: Exchange rate mappings for the `formatC` formatter
-- **Currency Source**: Source currency code (e.g. `EUR`)
-- **Currency Target**: Target currency code (e.g. `USD`)
-- **Document Name**: Name of the generated document file. Supports Carbone template syntax (e.g. `invoice-{d.name}.pdf`)
-- **Enum**: Enumeration lists for the `convEnum` formatter
-- **Hard Refresh**: Refresh report content after rendering. Use only for Table of Contents numbering in DOCX/ODT documents
-- **Language**: Locale of the generated document (e.g. `fr-FR`, `en-US`). Affects `formatN`, `formatD`, `formatI` formatters and `{t()}` translations
-- **Timezone**: Convert document dates to a timezone (e.g. `Europe/Paris`). Affects `formatD` and `formatI` formatters
-- **Translations**: Localization dictionary keyed by locale codes. All text in `{t()}` tags is replaced with the corresponding translation. Requires "Language" to be set
+- **Currency Rates / Source / Target**: Currency conversion settings for the `formatC` formatter
+- **Document Name**: Name of the generated document, without extension (appended automatically). Supports Carbone tags (e.g. `invoice-{d.name}`)
+- **Egress Authorization Header**: `authorization` header Carbone sends on its outbound requests (dynamic image URLs, webhooks, `appendFile`)
+- **Enum**: Enumerations for the `convEnum` formatter (JSON object)
+- **Fail On**: Stop the render with an error instead of a degraded document (e.g. `Image URL Error`)
+- **Hard Refresh**: Recompute pagination and Table of Contents after rendering. Requires "Convert To"
+- **Language**: Locale of the generated document (e.g. `fr-FR`). Used by `formatN`, `formatC` and `{t()}` translations
+- **Pre-Release Feature Level**: Apply pre-release features up to a given tag, for this render only
+- **Timezone**: Convert document dates to a timezone (e.g. `Europe/Paris`). Dates must be chained with `formatD`
+- **Translations**: Localization dictionary keyed by locale codes for `{t()}` tags. Requires "Language"
 - **Variable String**: Predefined aliases using Carbone template syntax (e.g. `{#def = d.ID}`)
-- **Webhook URL**: Enable asynchronous generation (up to 5 min). Carbone POSTs a Render ID to this URL when the document is ready. Use "Download Document" to retrieve it
+- **Webhook Authorization Header**: `authorization` header Carbone sends when calling your Webhook URL
+- **Webhook URL**: Enable asynchronous generation (render timeout raised to 5 min). Carbone POSTs a Render ID to this URL when ready - retrieve it with "Download Document"
 
 #### Download Document
 Download a document previously generated using its Render ID. Use this after a "Generate" with "Return Render ID" enabled or an asynchronous webhook generation.
@@ -102,9 +112,9 @@ Retrieve a list of all templates from your Carbone.io account with optional filt
 - **Version ID**: Filter by specific version ID
 - **Category**: Filter by template category
 - **Include Versions**: Include all versions for a specific template ID
-- **Origin**: Filter by template origin — All, API (created via API), or Studio (created via Carbone Studio)
+- **Origin**: Filter by template origin: All, API, Studio, Salesforce, Odoo or HubSpot
 - **Search**: Search in template name (fuzzy search), version ID (exact) or template ID (exact)
-- **Limit**: Maximum number of results to return (default: 50)
+- **Limit**: Maximum number of results to return (1 to 100, default: 50)
 - **Cursor**: Cursor for pagination
 
 #### List Categories
@@ -119,33 +129,35 @@ Upload a new template file to Carbone.io or add a new version to an existing tem
 **Parameters:**
 - **Binary Property Name**: The name of the binary property that contains the template file
 - **Add Version To**: Select an existing template to add a new version to (supports "From List" picker or manual ID input). Leave empty to create a new template.
+- **Category**: Dynamic dropdown populated from your Carbone.io categories
+- **Tags**: Dynamic multi-select dropdown populated from your Carbone.io tags
 - **Template Additional Options**:
-  - **Category**: Dynamic dropdown populated from your Carbone.io categories (`GET /templates/categories`)
-  - **Deployed At**: When a report is generated using the new template ID, Carbone selects the template version with the highest deployedAt timestamp that is not in the future
+  - **Deployed At**: Carbone uses the version with the most recent deployedAt. Future dates are rejected by the API
   - **Enable Versioning**: Whether to enable template versioning (default: true)
-  - **Expire At**: Expiration date after which the template is no longer accessible
-  - **Tags**: Dynamic multi-select dropdown populated from your Carbone.io tags (`GET /templates/tags`)
-  - **Template Comment**: Comment for the template
-  - **Template Name**: Name for the template
+  - **Expire At**: Date after which the template is scheduled for deletion (no longer listed, downloads and renders return 404). Leave empty so it never expires
+  - **Origin**: Where the template comes from (API, Studio, Salesforce, Odoo, HubSpot). Set at upload time only
+  - **Sample Data**: JSON sample stored with the template, used in Carbone Studio for testing
+  - **Template Comment / Template Name**: Metadata (max 200 characters each)
 
 #### Update Template
 Update the metadata of an existing template (name, comment, category, tags, deployedAt, expireAt) without re-uploading the file.
 
 **Parameters:**
-- **Template ID**: The unique identifier of the template to update (supports "From List" picker or manual ID input)
+- **Template ID**: The template or version to update. A template ID updates the currently deployed version; a version ID updates that exact version
 - **Update Fields**:
-  - **Category**: Dynamic dropdown populated from your Carbone.io categories
   - **Comment**: New comment for the template
-  - **Deployed At**: New deployment date
-  - **Expire At**: New expiration date
+  - **Deployed At**: New deployment date (future dates are rejected)
+  - **Expire At**: New expiration date. Add the field and leave it empty to cancel a scheduled deletion
+  - **Move to Template ID**: Move the version to another template ID
   - **Name**: New name for the template
-  - **Tags**: Dynamic multi-select dropdown populated from your Carbone.io tags
+- **Category**: Dynamic dropdown populated from your Carbone.io categories
+- **Tags**: Dynamic multi-select dropdown populated from your Carbone.io tags
 
 #### Delete Template
-Delete a template from your Carbone.io account.
+Delete a template (soft deletion: it immediately stops being returned by the API, the file is removed after the retention delay, 24 hours on Carbone Cloud).
 
 **Parameters:**
-- **Template ID**: The unique identifier of the template to delete
+- **Template ID**: A template ID deletes all versions; a version ID deletes that specific version
 
 
 ## Credentials
@@ -157,14 +169,18 @@ To use the Carbone.io node, you need to authenticate with your Carbone.io accoun
 2. Obtain your API key from your Carbone.io dashboard
 
 ### Authentication Setup
-1. **API Key**: Your Carbone.io API key for authentication
+1. **API Key**: Your Carbone.io API key. Optional for On-Premise instances that do not require authentication
 2. **API URL**: The base URL for Carbone.io API (default: https://api.carbone.io)
    - Change this if you're using a self-hosted instance
-3. **Carbone API Version**: The version of the Carbone API to use (4 or 5, default: 5)
+3. **Carbone API Version**: 5
 
 The node uses Bearer token authentication with the Authorization header and includes the carbone-version header for API versioning.
 
 ## Development
+
+### Unit Tests
+
+Run `npm test` (vitest). Tests live in `__tests__/` and mock the n8n execution context, no API key needed.
 
 ### Import Test Workflows
 
@@ -179,9 +195,9 @@ Test workflows are stored in the `test/` folder. You can import them manually on
 ## Compatibility
 
 Tested with:
-- n8n: `1.111.1`, `1.112.5`
-- Carbone API: `v4`, `v5`
-- NodeJS: `22.10.0`
+- n8n: `1.111.1`, `1.112.5`, `2.40.5`
+- Carbone API: `v5`
+- NodeJS: `22.10.0`, `26.x`
 
 ## Usage
 
@@ -205,7 +221,8 @@ Tested with:
 - **Localization**: Set language, timezone, and translations for multilingual documents
 - **Currency Conversion**: Use currency rates and source/target currency for financial documents
 - **Batch Generation**: Set `Batch Split By` to a JSON path (e.g. `d.orders`) to generate one document per item in the array, then collect results as a ZIP or merged PDF via `Batch Output`
-- **PDF Engine Selection**: Use `Converter` to pick the rendering engine best suited for your template format (LibreOffice for ODT/ODS, OnlyOffice for DOCX/XLSX/PPTX, Chromium for HTML)
+- **PDF Engine Selection**: Use `Converter` to pick the rendering engine best suited for your template format (Carbone ICE for DOCX/ODT, LibreOffice for ODT/ODS, OnlyOffice for XLSX/PPTX, Chromium for HTML)
+- **PDF Protection**: Use `Format Options` to encrypt the PDF, require an open password, restrict printing/changes, or stamp up to 4 watermarks
 
 
 ## Resources
@@ -217,14 +234,41 @@ Tested with:
 
 ## Version history
 
+### 2.1.0
+
+No breaking changes. Aligned with the Carbone API v5.15 specification.
+
+**New: Generate Document**
+- **Carbone ICE converter** (`I`): the fastest DOCX/ODT to PDF engine, also available in Convert Office to PDF
+- **Format Options**: PDF encryption and passwords, permission restrictions, up to 4 text watermarks, PDF/A and PDF/UA compliance, image (pixel size, quality) and CSV (separator, delimiter, charset) output options
+- **Fail On**: stop the render with an error when a dynamic image URL cannot be fetched
+- **Batch Report Name**: name each file inside a ZIP batch export, Carbone tags accepted
+- **Webhook / Egress Authorization headers**: authenticate Carbone's calls to your webhook and to your image or file URLs
+- **Pre-Release Feature Level**: opt into pre-release rendering features per render
+
+**New: Templates**
+- Upload: **Origin** and **Sample Data** (Carbone Studio sample) options
+- Update: **Move to Template ID** (move a version to another template), cancel a scheduled deletion by leaving **Expire At** empty
+- List: Origin filter now includes Salesforce, Odoo and HubSpot
+
+**Fixes**
+- Workflows created with v1.x using a stored Template ID work again (Template Source migration)
+- Update Template: `deployedAt` and `expireAt` are sent as integers, as required by the API
+- List Templates: `limit` is capped at 100 (API maximum); origins 2 to 4 are returned as labels
+- Behavior note: in Update Template, an "Expire At" field added but left empty now cancels a scheduled deletion (it was previously ignored)
+- Clearer descriptions everywhere, aligned with the API v5.15 specification (soft deletion, document name without extension, timezone/language formatters)
+
+**Internal**
+- 40 vitest unit tests, CI (lint, tests, build) and npm provenance publishing via GitHub Actions
+
 ### 2.0.0
 
-**⚠️ Breaking change — Generate Document: Template Source**
+**⚠️ Breaking change - Generate Document: Template Source**
 
 The `Use Inline Template File (Base64)` boolean toggle has been replaced by a `Template Source` selector with three options:
-- **Template ID** *(default)*: Use a stored Carbone template — same as before
-- **File** *(new)*: Connect any node that outputs a binary file directly — no manual base64 encoding needed
-- **Base64 String**: Provide an inline base64 string — same as the old `true` toggle
+- **Template ID** *(default)*: Use a stored Carbone template - same as before
+- **File** *(new)*: Connect any node that outputs a binary file directly - no manual base64 encoding needed
+- **Base64 String**: Provide an inline base64 string - same as the old `true` toggle
 
 **Migration:** select "Base64 String" to restore the previous behavior. Select "File" to remove the manual encoding step from your workflows.
 
@@ -246,11 +290,11 @@ The `Use Inline Template File (Base64)` boolean toggle has been replaced by a `T
 - List response: `expireAt` returned as ISO string; `origin` returned as `"API"` or `"Studio"`
 
 **New: Render Document options**
-- **Webhook URL**: enable asynchronous generation (up to 5 min) — Carbone POSTs a Render ID to your URL when ready
-- **Return Render ID**: replaces the previous "Download" toggle with clearer semantics — file downloaded by default, enable to get a Render ID instead
+- **Webhook URL**: enable asynchronous generation (up to 5 min) - Carbone POSTs a Render ID to your URL when ready
+- **Return Render ID**: replaces the previous "Download" toggle with clearer semantics - file downloaded by default, enable to get a Render ID instead
 - **Converter** is now a standalone field shown only when "Convert To" is set to PDF
 - Added RTF, XLS, GIF, TIFF to the "Convert To" dropdown
-- Added "Same as Template" as the default option in "Convert To" — no conversion unless explicitly selected
+- Added "Same as Template" as the default option in "Convert To" - no conversion unless explicitly selected
 - Added `converter`, `batchSplitBy`, and `batchOutput` options
 
 **UX improvements**

@@ -17,7 +17,8 @@ export const templateOperations: INodeProperties[] = [
 				name: 'Delete',
 				value: 'delete',
 				action: 'Delete template',
-				description: 'Delete a template from Carbone.io',
+				description:
+					'Delete a template from Carbone.io (soft deletion: the template immediately stops being returned by the API, and the file is removed once the retention delay has passed - 24 hours on Carbone Cloud)',
 			},
 			{
 				name: 'Download',
@@ -121,7 +122,8 @@ export const updateOperation: INodeProperties[] = [
 		type: 'resourceLocator',
 		default: { mode: 'id', value: '' },
 		required: true,
-		description: 'The ID of the template or version to update',
+		description:
+			'The template or version to update. A template ID updates the currently deployed version; a version ID updates that exact version.',
 		displayOptions: {
 			show: {
 				resource: ['template'],
@@ -142,7 +144,7 @@ export const updateOperation: INodeProperties[] = [
 				displayName: 'ID',
 				name: 'id',
 				type: 'string',
-				placeholder: 'e.g. tmpl_123456789',
+				placeholder: 'e.g. tmpl_123456789 or SHA256 version ID',
 			},
 		],
 	},
@@ -164,7 +166,7 @@ export const updateOperation: INodeProperties[] = [
 				name: 'comment',
 				type: 'string',
 				default: '',
-				description: 'Comment describing this version of the template',
+				description: 'Comment describing this version of the template (max 200 characters)',
 			},
 			{
 				displayName: 'Deployed At',
@@ -172,21 +174,31 @@ export const updateOperation: INodeProperties[] = [
 				type: 'dateTime',
 				default: '',
 				description:
-					'UTC timestamp for active version selection. Carbone selects the version with the highest deployedAt that is not in the future.',
+					'UTC date used for active version selection: Carbone uses the version with the most recent deployedAt. Future values are not allowed and are rejected by the API.',
 			},
 			{
 				displayName: 'Expire At',
 				name: 'expireAt',
 				type: 'dateTime',
 				default: '',
-				description: 'UTC timestamp after which the template is automatically deleted',
+				description:
+					'UTC date after which the template is scheduled for deletion. After that time, the template is no longer listed, cannot be downloaded, and generating a document with it returns "404 Template not found". Leave the field empty to cancel a scheduled deletion and make the template permanent again.',
+			},
+			{
+				displayName: 'Move to Template ID',
+				name: 'id',
+				type: 'string',
+				default: '',
+				placeholder: 'e.g. tmpl_123456789',
+				description:
+					'Moves the version to another template ID (version IDs in SHA256 format are not allowed). Target the version with its version ID in the URL field above, otherwise the currently deployed version is moved. An error is returned if the move creates a deployedAt conflict on the destination template.',
 			},
 			{
 				displayName: 'Name',
 				name: 'name',
 				type: 'string',
 				default: '',
-				description: 'New name for the template',
+				description: 'New name for the template (max 200 characters)',
 			},
 		],
 	},
@@ -256,6 +268,21 @@ export const listOperation: INodeProperties[] = [
 				description: 'Templates uploaded via the API',
 			},
 			{
+				name: 'HubSpot',
+				value: 4,
+				description: 'Templates uploaded via the HubSpot integration',
+			},
+			{
+				name: 'Odoo',
+				value: 3,
+				description: 'Templates uploaded via the Odoo integration',
+			},
+			{
+				name: 'Salesforce',
+				value: 2,
+				description: 'Templates uploaded via the Salesforce integration',
+			},
+			{
 				name: 'Studio',
 				value: 1,
 				description: 'Templates uploaded via Carbone Studio',
@@ -282,6 +309,7 @@ export const listOperation: INodeProperties[] = [
 		type: 'number',
 		typeOptions: {
 			minValue: 1,
+			maxValue: 100,
 		},
 		default: 50,
 		description: 'Max number of results to return',
@@ -370,7 +398,7 @@ export const templateUploadAdditionalOptions: INodeProperties[] = [
 				type: 'dateTime',
 				default: '',
 				description:
-					'UTC timestamp for active version selection. Carbone selects the version with the highest deployedAt that is not in the future.',
+					'UTC date used for active version selection: Carbone uses the version with the most recent deployedAt. Future values are not allowed and are rejected by the API.',
 			},
 			{
 				displayName: 'Enable Versioning',
@@ -384,21 +412,66 @@ export const templateUploadAdditionalOptions: INodeProperties[] = [
 				name: 'expireAt',
 				type: 'dateTime',
 				default: '',
-				description: 'UTC timestamp after which the template is automatically deleted',
+				description:
+					'UTC date after which the template is scheduled for deletion. After that time, the template is no longer listed, cannot be downloaded, and generating a document with it returns "404 Template not found". The file itself is deleted once the storage retention delay has passed. Leave empty so the template never expires.',
+			},
+			{
+				displayName: 'Origin',
+				name: 'origin',
+				type: 'options',
+				default: 0,
+				description:
+					'Origin of the template. Set at upload time only: it cannot be changed afterwards.',
+				options: [
+					{
+						name: 'API',
+						value: 0,
+						description: 'Template uploaded via the API (default)',
+					},
+					{
+						name: 'HubSpot',
+						value: 4,
+						description: 'Template uploaded via the HubSpot integration',
+					},
+					{
+						name: 'Odoo',
+						value: 3,
+						description: 'Template uploaded via the Odoo integration',
+					},
+					{
+						name: 'Salesforce',
+						value: 2,
+						description: 'Template uploaded via the Salesforce integration',
+					},
+					{
+						name: 'Studio',
+						value: 1,
+						description: 'Template uploaded via Carbone Studio',
+					},
+				],
+			},
+			{
+				displayName: 'Sample Data',
+				name: 'sample',
+				type: 'json',
+				default: '',
+				placeholder: '{ "data": { "firstName": "John" }, "complement": {} }',
+				description:
+					'Sample input data stored with the template, used in Carbone Studio for testing and development. JSON object with optional keys: "data", "complement", "translations" and "enum".',
 			},
 			{
 				displayName: 'Template Comment',
 				name: 'comment',
 				type: 'string',
 				default: '',
-				description: 'Comment describing this version of the template',
+				description: 'Comment describing this version of the template (max 200 characters)',
 			},
 			{
 				displayName: 'Template Name',
 				name: 'name',
 				type: 'string',
 				default: '',
-				description: 'Name for the template',
+				description: 'Name for the template (max 200 characters)',
 			},
 		],
 	},
@@ -501,7 +574,7 @@ export const uploadTagsField: INodeProperties[] = [
 		name: 'tags',
 		type: 'multiOptions',
 		default: [],
-		description: 'Tags to assign to the template. Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a> to set new or mixed tags, e.g. <code>{{ ["invoices", "2024"] }}</code>. Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+		description: 'Tags to assign to the template. Duplicates are removed and the list is returned sorted alphabetically; the whole list is limited to 100 characters. Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a> to set new or mixed tags, e.g. <code>{{ ["invoices", "2024"] }}</code>. Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 		displayOptions: {
 			show: {
 				resource: ['template'],
@@ -520,7 +593,7 @@ export const updateTagsField: INodeProperties[] = [
 		name: 'tags',
 		type: 'multiOptions',
 		default: [],
-		description: 'Tags to assign to the template. Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a> to set new or mixed tags, e.g. <code>{{ ["invoices", "2024"] }}</code>. Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+		description: 'Tags to assign to the template. Duplicates are removed and the list is returned sorted alphabetically; the whole list is limited to 100 characters. Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a> to set new or mixed tags, e.g. <code>{{ ["invoices", "2024"] }}</code>. Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 		displayOptions: {
 			show: {
 				resource: ['template'],

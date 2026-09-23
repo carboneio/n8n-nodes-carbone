@@ -25,7 +25,7 @@ export const convertOperations: INodeProperties[] = [
 				value: 'convertOfficeToPdf',
 				action: 'Convert office to pdf',
 				description:
-					'Convert an Office document (DOCX, XLSX, PPTX, ODT, ODS, ODP, ODG) to PDF',
+					'Convert an Office document (DOCX, DOC, XLSX, XLS, PPTX, PPT, ODT, ODS, ODP, ODG, RTF, TXT, CSV, MD, IDML, XML) to PDF',
 			},
 		],
 		default: 'convertHtmlToPdf',
@@ -192,7 +192,7 @@ export const convertOfficeToPdfFields: INodeProperties[] = [
 		required: true,
 		default: 'data',
 		description:
-			'Upload an Office document to convert to PDF. Supported formats: DOCX, XLSX, PPTX, ODT, ODS, ODP, ODG. To inject dynamic data, use the action "Generate a Document" instead.',
+			'Upload an Office document to convert to PDF. Supported formats: DOCX, DOC, XLSX, XLS, PPTX, PPT, ODT, ODS, ODP, ODG, RTF, TXT, CSV, MD (Markdown), IDML, XML. To inject dynamic data, use the action "Generate a Document" instead.',
 		hint: 'Enter the name of the binary field that holds the Office file (e.g. data, file, attachment_0, etc.)',
 		displayOptions: {
 			show: {
@@ -249,6 +249,12 @@ export const convertOfficeToPdfFields: INodeProperties[] = [
 		},
 		options: [
 			{
+				name: 'Carbone ICE (Fastest)',
+				value: 'I',
+				description:
+					'The fastest PDF converter for DOCX and ODT documents: Carbone draws the PDF itself, with no office suite involved',
+			},
+			{
 				name: 'LibreOffice (Default)',
 				value: 'L',
 				description:
@@ -258,7 +264,7 @@ export const convertOfficeToPdfFields: INodeProperties[] = [
 				name: 'OnlyOffice',
 				value: 'O',
 				description:
-					'Ideal for Microsoft Office formats: DOCX, XLSX, PPTX. Provides better fidelity with Office-specific features.',
+					'Ideal for Microsoft Office formats: XLSX, PPTX. For DOCX to PDF, Carbone ICE is recommended instead.',
 			},
 		],
 	},

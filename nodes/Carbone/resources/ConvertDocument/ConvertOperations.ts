@@ -12,10 +12,7 @@ interface CarboneCredentials {
 	carboneVersion: string;
 }
 
-/**
- * Converts a Uint8Array (or ArrayBuffer view) to a base64 string
- * without relying on the Node.js Buffer global.
- */
+// Converts an ArrayBuffer to a base64 string without the Node.js Buffer global
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
 	const bytes = new Uint8Array(buffer);
 	let binary = '';
@@ -25,12 +22,9 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 	return btoa(binary);
 }
 
-/**
- * Converts a plain string to a base64-encoded string
- * without relying on the Node.js Buffer global.
- */
+// Converts a plain string to base64 without the Node.js Buffer global
 function stringToBase64(str: string): string {
-	// Use TextEncoder to handle UTF-8 properly, then encode as base64
+	// TextEncoder handles UTF-8 properly before the base64 encoding
 	const encoder = new TextEncoder();
 	const bytes = encoder.encode(str);
 	let binary = '';
@@ -41,10 +35,7 @@ function stringToBase64(str: string): string {
 }
 
 export class ConvertOperations {
-	/**
-	 * Sends a base64-encoded document to POST /render/template?download=true
-	 * and returns the converted PDF as binary output.
-	 */
+	// Sends a base64 document to POST /render/template?download=true and returns the PDF as binary
 	private async callRenderTemplate(
 		this: IExecuteFunctions,
 		i: number,
@@ -99,9 +90,7 @@ export class ConvertOperations {
 		};
 	}
 
-	/**
-	 * Reads an n8n binary property and returns its content as a base64 string.
-	 */
+	// Reads an n8n binary property and returns its content as base64
 	private async readBinaryAsBase64(
 		this: IExecuteFunctions,
 		i: number,
@@ -112,9 +101,7 @@ export class ConvertOperations {
 		return fileBuffer.toString('base64');
 	}
 
-	/**
-	 * Downloads a template by ID from Carbone and returns its content as base64.
-	 */
+	// Downloads a template by ID from Carbone and returns its content as base64
 	private async downloadTemplateAsBase64(
 		this: IExecuteFunctions,
 		i: number,

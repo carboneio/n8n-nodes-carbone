@@ -87,7 +87,9 @@
           "versioning": true,
           "expireAt": "={{ DateTime.now().plus({ days: 5 }).startOf('day').toUTC().toISO() }}",
           "comment": "Comment OK",
-          "name": "Name OK"
+          "name": "Name OK",
+          "origin": 1,
+          "sample": "{ \"data\": { \"testKey\": \"testValue\" } }"
         }
       },
       "type": "CUSTOM.carbone",
@@ -193,9 +195,9 @@
             {
               "id": "dc7b196a-5afc-4962-9271-e70659d6e915",
               "leftValue": "={{ $json.data[0].origin }}",
-              "rightValue": 0,
+              "rightValue": "Studio",
               "operator": {
-                "type": "number",
+                "type": "string",
                 "operation": "equals"
               }
             }

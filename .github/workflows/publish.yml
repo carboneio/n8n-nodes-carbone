@@ -1,0 +1,43 @@
+# Publishes the package to npm with provenance on every version tag, as n8n requires since May 2026.
+# Release process: run `npm run release` locally, the pushed tag triggers this workflow.
+# One-time setup: add a Trusted Publisher on npmjs.com (owner carboneio, repo n8n-nodes-carbone,
+# workflow publish.yml), or set an NPM_TOKEN automation token in the repo secrets.
+
+name: Publish
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+  publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Required to mint an OIDC token for npm provenance attestation.
+      id-token: write
+      # Scoped down from the default (write) for least-privilege publishing.
+      contents: read
+
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Release
+        # Publishes to npm with a provenance attestation (requires id-token: write above).
+        # Lint and build run automatically as part of the release process.
+        run: |
+          [ -n "$NPM_TOKEN" ] && npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"
+          npm run release
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

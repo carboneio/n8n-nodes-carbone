@@ -19,9 +19,12 @@ interface TemplateUploadOptions {
 	comment?: string;
 	expireAt?: string;
 	deployedAt?: string;
+	origin?: number;
+	sample?: unknown;
 }
 
 interface TemplateUpdateFields {
+	id?: string;
 	name?: string;
 	comment?: string;
 	expireAt?: string;
@@ -42,8 +45,12 @@ interface TemplateResponse {
 }
 
 export class TemplateOperations {
-	private static convertIsoToUnixTimestamp(isoString: string): string {
-		return Math.floor(new Date(isoString).getTime() / 1000).toString();
+	// The API requires Unix timestamps as integers, never as strings
+	private static toUnixTimestamp(value: string | number): number {
+		if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
+			return Math.floor(new Date(value).getTime() / 1000);
+		}
+		return Number(value);
 	}
 
 	private static convertUnixTimestampToIso(timestamp: number): string | undefined {
@@ -79,10 +86,15 @@ export class TemplateOperations {
 					if (item.expireAt !== undefined && typeof item.expireAt === 'number') {
 						item.expireAt = TemplateOperations.convertUnixTimestampToIso(item.expireAt);
 					}
-					if (item.origin === 0) {
-						item.origin = 'API';
-					} else if (item.origin === 1) {
-						item.origin = 'Studio';
+					const originLabels: Record<number, string> = {
+						0: 'API',
+						1: 'Studio',
+						2: 'Salesforce',
+						3: 'Odoo',
+						4: 'HubSpot',
+					};
+					if (typeof item.origin === 'number' && originLabels[item.origin] !== undefined) {
+						item.origin = originLabels[item.origin];
 					}
 					return item;
 				});
@@ -137,6 +149,7 @@ export class TemplateOperations {
 		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
 
 		const body: Record<string, unknown> = {};
+		if (updateFields.id) body.id = updateFields.id;
 		if (updateFields.name) body.name = updateFields.name;
 		if (updateFields.comment) body.comment = updateFields.comment;
 		const category = this.getNodeParameter('category', i, '') as string;
@@ -146,10 +159,13 @@ export class TemplateOperations {
 			body.tags = tags;
 		}
 		if (updateFields.deployedAt) {
-			body.deployedAt = TemplateOperations.convertIsoToUnixTimestamp(updateFields.deployedAt);
+			body.deployedAt = TemplateOperations.toUnixTimestamp(updateFields.deployedAt);
 		}
-		if (updateFields.expireAt) {
-			body.expireAt = TemplateOperations.convertIsoToUnixTimestamp(updateFields.expireAt);
+		if ('expireAt' in updateFields) {
+			// The field added but left empty cancels a scheduled deletion (expireAt = 0: never expires)
+			body.expireAt = updateFields.expireAt
+				? TemplateOperations.toUnixTimestamp(updateFields.expireAt)
+				: 0;
 		}
 
 		try {
@@ -263,7 +279,7 @@ export class TemplateOperations {
 		const expireAt = templateUploadAdditionalOptions.expireAt || '';
 		const deployedAt = templateUploadAdditionalOptions.deployedAt || '';
 
-		// Convert file to base64 and send as JSON — avoids multipart array-encoding issues
+		// Send the file as base64 in a JSON body because multipart breaks array fields like tags
 		const templateBase64 = fileBuffer.toString('base64');
 
 		const body: Record<string, unknown> = {
@@ -277,18 +293,32 @@ export class TemplateOperations {
 		if (category) body.category = category;
 		if (tags.length > 0) body.tags = tags;
 		if (expireAt) {
-			body.expireAt = Number(
-				typeof expireAt === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(expireAt)
-					? TemplateOperations.convertIsoToUnixTimestamp(expireAt)
-					: expireAt,
-			);
+			body.expireAt = TemplateOperations.toUnixTimestamp(expireAt);
 		}
 		if (deployedAt) {
-			body.deployedAt = Number(
-				typeof deployedAt === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(deployedAt)
-					? TemplateOperations.convertIsoToUnixTimestamp(deployedAt)
-					: deployedAt,
-			);
+			body.deployedAt = TemplateOperations.toUnixTimestamp(deployedAt);
+		}
+		if (templateUploadAdditionalOptions.origin) {
+			body.origin = templateUploadAdditionalOptions.origin;
+		}
+		// The API expects `sample` as an array with a single object ({data, complement, translations, enum})
+		let sample = templateUploadAdditionalOptions.sample;
+		if (typeof sample === 'string' && sample.trim() !== '') {
+			try {
+				sample = JSON.parse(sample);
+			} catch (error) {
+				throw new NodeOperationError(
+					this.getNode(),
+					`Invalid JSON in Sample Data: ${(error as Error).message}`,
+					{
+						description: 'The Sample Data option must be valid JSON',
+						itemIndex: i,
+					},
+				);
+			}
+		}
+		if (sample && typeof sample === 'object') {
+			body.sample = Array.isArray(sample) ? sample : [sample];
 		}
 
 		try {

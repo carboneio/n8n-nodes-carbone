@@ -26,8 +26,16 @@ interface GenerateOptions {
 	hardRefresh?: boolean;
 	batchSplitBy?: string;
 	batchOutput?: string;
+	batchReportName?: string;
+	preReleaseFeatureIn?: number;
+	failOn?: string[];
 	webhookUrl?: string;
+	webhookAuthorization?: string;
+	egressAuthorization?: string;
 }
+
+// Output formats that accept `formatOptions` (must match the Format Options collection display condition)
+const FORMAT_OPTIONS_FORMATS = ['pdf', 'jpg', 'png', 'csv'];
 
 export class RenderOperations {
 	private async readBinaryAsBase64(
@@ -38,6 +46,37 @@ export class RenderOperations {
 		this.helpers.assertBinaryData(i, binaryPropertyName);
 		const fileBuffer = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
 		return fileBuffer.toString('base64');
+	}
+
+	// Builds the formatOptions object, or returns undefined so the plain string convertTo is sent
+	private static buildFormatOptions(
+		raw: IDataObject,
+		convertTo: string,
+	): IDataObject | undefined {
+		if (!FORMAT_OPTIONS_FORMATS.includes(convertTo)) {
+			return undefined;
+		}
+		const formatOptions: IDataObject = {};
+		for (const [key, value] of Object.entries(raw)) {
+			if (key === 'Watermarks') {
+				const container = value as { watermarkValues?: IDataObject[] };
+				const watermarks = (container?.watermarkValues ?? []).map((watermark) => {
+					const cleaned: IDataObject = { ...watermark };
+					// 0 means "use the API default" for these fields
+					if (!cleaned.size) delete cleaned.size;
+					if (!cleaned.toPage) delete cleaned.toPage;
+					return cleaned;
+				});
+				if (watermarks.length > 0) {
+					formatOptions.Watermarks = watermarks;
+				}
+			} else if (value !== '' && value !== undefined && value !== null) {
+				// The API expects 0/1 integers for these two PNG options, exposed as booleans in the UI
+				formatOptions[key] =
+					key === 'Interlaced' || key === 'Translucent' ? (value ? 1 : 0) : value;
+			}
+		}
+		return Object.keys(formatOptions).length > 0 ? formatOptions : undefined;
 	}
 
 	private static parseResponse(response: unknown): unknown {
@@ -54,7 +93,16 @@ export class RenderOperations {
 	}
 
 	async generateDocument(this: IExecuteFunctions, i: number): Promise<INodeExecutionData> {
-		const templateSource = this.getNodeParameter('templateSource', i) as string;
+		// v1.x workflows stored templateSource as a boolean (false = template ID, true = base64)
+		const rawTemplateSource = this.getNodeParameter('templateSource', i, 'templateId') as
+			| string
+			| boolean;
+		const templateSource =
+			rawTemplateSource === false
+				? 'templateId'
+				: rawTemplateSource === true
+					? 'base64'
+					: rawTemplateSource;
 		const ops = new RenderOperations();
 		let templateId: string | undefined;
 		let templateBase64: string | undefined;
@@ -95,9 +143,13 @@ export class RenderOperations {
 
 		const requestBody: Record<string, unknown> = { data };
 
-		// Ajouter convertTo si spécifié
+		// convertTo devient un objet { formatName, formatOptions } quand des Format Options sont définies
 		if (convertTo) {
-			requestBody.convertTo = convertTo;
+			const formatOptionsRaw = this.getNodeParameter('formatOptions', i, {}) as IDataObject;
+			const formatOptions = RenderOperations.buildFormatOptions(formatOptionsRaw, convertTo);
+			requestBody.convertTo = formatOptions
+				? { formatName: convertTo, formatOptions }
+				: convertTo;
 		}
 
 		if (converter) {
@@ -122,6 +174,12 @@ export class RenderOperations {
 			if (additionalOptions.hardRefresh) requestBody.hardRefresh = additionalOptions.hardRefresh;
 			if (additionalOptions.batchSplitBy) requestBody.batchSplitBy = additionalOptions.batchSplitBy;
 			if (additionalOptions.batchOutput) requestBody.batchOutput = additionalOptions.batchOutput;
+			if (additionalOptions.batchReportName)
+				requestBody.batchReportName = additionalOptions.batchReportName;
+			if (additionalOptions.preReleaseFeatureIn)
+				requestBody.preReleaseFeatureIn = additionalOptions.preReleaseFeatureIn;
+			if (additionalOptions.failOn && additionalOptions.failOn.length > 0)
+				requestBody.failOn = additionalOptions.failOn;
 		}
 
 		// Build URL and body based on template source
@@ -135,6 +193,12 @@ export class RenderOperations {
 
 		const webhookUrl = additionalOptions?.webhookUrl;
 
+		// The egress header covers all outbound Carbone traffic (images, appendFile, webhooks), so both branches need it
+		const baseHeaders: IDataObject = { 'Content-Type': 'application/json' };
+		if (additionalOptions?.egressAuthorization) {
+			baseHeaders['carbone-egress-header-authorization'] = additionalOptions.egressAuthorization;
+		}
+
 		try {
 			if (!returnRenderId && !webhookUrl) {
 				// Download the file directly (?download=true)
@@ -144,9 +208,7 @@ export class RenderOperations {
 					qs: {
 						download: 'true',
 					},
-					headers: {
-						'Content-Type': 'application/json',
-					},
+					headers: baseHeaders,
 					body: requestBody,
 					returnFullResponse: true,
 					encoding: 'arraybuffer',
@@ -181,9 +243,13 @@ export class RenderOperations {
 					},
 				};
 			} else {
-				const headers: IDataObject = { 'Content-Type': 'application/json' };
+				const headers: IDataObject = { ...baseHeaders };
 				if (webhookUrl) {
 					headers['carbone-webhook-url'] = webhookUrl;
+					if (additionalOptions?.webhookAuthorization) {
+						headers['carbone-webhook-header-authorization'] =
+							additionalOptions.webhookAuthorization;
+					}
 				}
 
 				const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {

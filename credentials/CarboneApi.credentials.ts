@@ -10,7 +10,10 @@ export class CarboneApi implements ICredentialType {
 	name = 'carboneApi';
 	displayName = 'Carbone API';
 	documentationUrl = 'https://carbone.io/api-reference.html';
-	icon: Icon = 'file:../nodes/Carbone/carbone.svg';
+	icon: Icon = {
+		light: 'file:../nodes/Carbone/carbone.svg',
+		dark: 'file:../nodes/Carbone/carbone-dark.svg',
+	};
 
 	properties: INodeProperties[] = [
 		{
@@ -21,7 +24,8 @@ export class CarboneApi implements ICredentialType {
 				password: true,
 			},
 			default: '',
-			description: 'The API key for Carbone.io service',
+			description:
+				'The API key for Carbone Cloud (https://api.carbone.io). Optional for On-Premise instances that do not require authentication.',
 		},
 		{
 			displayName: 'API URL',
@@ -34,10 +38,16 @@ export class CarboneApi implements ICredentialType {
 		{
 			displayName: 'Carbone API Version',
 			name: 'carboneVersion',
-			type: 'string',
+			type: 'options',
+			options: [
+				{
+					name: '5 (Latest)',
+					value: '5',
+				},
+			],
 			default: '5',
-			description: 'The version of the Carbone API to use (4 or 5)',
-			placeholder: '5',
+			description:
+				'The version of the Carbone API to use. This node requires version 5: without this header the API falls back to an older version that does not support all the node options.',
 		},
 	];
 
