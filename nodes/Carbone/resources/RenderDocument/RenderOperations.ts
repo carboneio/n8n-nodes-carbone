@@ -80,12 +80,12 @@ export class RenderOperations {
 	}
 
 	private static parseResponse(response: unknown): unknown {
-		// Parser la réponse JSON si c'est une chaîne pour éviter le double encodage
+		// Parse string responses to avoid double encoded JSON
 		if (typeof response === 'string') {
 			try {
 				return JSON.parse(response);
 			} catch {
-				// Si le parsing échoue, utiliser la réponse originale
+				// Keep the original response when parsing fails
 				return response;
 			}
 		}
@@ -129,7 +129,7 @@ export class RenderOperations {
 
 		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
 
-		// Gérer le parsing JSON pour les deux formats: string et objet
+		// Accept the data as a JSON string or as an object
 		if (typeof data === 'string') {
 			try {
 				data = JSON.parse(data);
@@ -143,7 +143,7 @@ export class RenderOperations {
 
 		const requestBody: Record<string, unknown> = { data };
 
-		// convertTo devient un objet { formatName, formatOptions } quand des Format Options sont définies
+		// convertTo becomes a { formatName, formatOptions } object when Format Options are set
 		if (convertTo) {
 			const formatOptionsRaw = this.getNodeParameter('formatOptions', i, {}) as IDataObject;
 			const formatOptions = RenderOperations.buildFormatOptions(formatOptionsRaw, convertTo);
@@ -156,7 +156,7 @@ export class RenderOperations {
 			requestBody.converter = converter;
 		}
 
-		// Ajouter les options supplémentaires
+		// Apply the additional options
 		if (additionalOptions) {
 			if (additionalOptions.timezone) requestBody.timezone = additionalOptions.timezone;
 			if (additionalOptions.lang) requestBody.lang = additionalOptions.lang;
@@ -214,17 +214,17 @@ export class RenderOperations {
 					encoding: 'arraybuffer',
 				});
 
-				// Extraire le nom du fichier depuis Content-Disposition
+				// Extract the file name from the Content-Disposition header
 				const contentDisposition =
 					((response.headers as IDataObject)['content-disposition'] as string) || '';
-				let fileName = 'document'; // fallback par défaut
+				let fileName = 'document'; // default fallback
 
 				const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
 				if (filenameMatch && filenameMatch[1]) {
 					fileName = filenameMatch[1].replace(/['"]/g, '');
 				}
 
-				// Laisser n8n gérer le content-type automatiquement
+				// Let n8n detect the content type automatically
 				const buffer = response.body as unknown as Buffer;
 				const binaryData = {
 					data: await this.helpers.prepareBinaryData(buffer, fileName),
@@ -284,17 +284,17 @@ export class RenderOperations {
 				encoding: 'arraybuffer',
 			});
 
-			// Extraire le nom du fichier depuis Content-Disposition
+			// Extract the file name from the Content-Disposition header
 			const contentDisposition =
 				((response.headers as IDataObject)['content-disposition'] as string) || '';
-			let fileName = 'document'; // fallback par défaut
+			let fileName = 'document'; // default fallback
 
 			const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
 			if (filenameMatch && filenameMatch[1]) {
 				fileName = filenameMatch[1].replace(/['"]/g, '');
 			}
 
-			// Laisser n8n gérer le content-type automatiquement
+			// Let n8n detect the content type automatically
 			const buffer = response.body as unknown as Buffer;
 			const binaryData = {
 				data: await this.helpers.prepareBinaryData(buffer, fileName),

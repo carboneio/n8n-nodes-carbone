@@ -1,5 +1,5 @@
 {
-	"node": "n8n-nodes-base.Carbone",
+	"node": "n8n-nodes-carbone.Carbone",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Miscellaneous"],

@@ -13,7 +13,7 @@ import {
 import { renderOperations, renderFields } from './resources/RenderDocument/RenderDescription';
 import { convertOperations, convertFields } from './resources/ConvertDocument/ConvertDescription';
 
-// Resource unifiée
+// Unified resource selector
 export const resource: INodeProperties[] = [
 	{
 		displayName: 'Resource',

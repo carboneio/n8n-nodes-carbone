@@ -1,7 +1,11 @@
-import { NodeApiError, JsonObject, INode } from 'n8n-workflow';
+import { NodeApiError, NodeOperationError, JsonObject, INode } from 'n8n-workflow';
 
 export class CarboneErrorHandler {
-	static handleApiError(error: unknown, node: INode): NodeApiError {
+	static handleApiError(error: unknown, node: INode): NodeApiError | NodeOperationError {
+		// Errors already typed for n8n are returned unchanged
+		if (error instanceof NodeApiError || error instanceof NodeOperationError) {
+			return error;
+		}
 		const carboneMessage = CarboneErrorHandler.extractCarboneMessage(error);
 		if (carboneMessage) {
 			return new NodeApiError(node, error as JsonObject, { message: carboneMessage });

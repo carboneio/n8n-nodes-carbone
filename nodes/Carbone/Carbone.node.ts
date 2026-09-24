@@ -4,10 +4,9 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	NodeOperationError,
-	NodeApiError,
 	NodeConnectionTypes,
-	JsonObject,
 } from 'n8n-workflow';
+import { CarboneErrorHandler } from './utils/errorHandler';
 import {
 	resource,
 	templateOperations,
@@ -60,7 +59,7 @@ export class Carbone implements INodeType {
 			},
 		},
 		properties: [
-			// Resource unifiée
+			// Unified resource selector
 			...resource,
 			...convertOperations,
 			...templateOperations,
@@ -169,30 +168,8 @@ export class Carbone implements INodeType {
 					continue;
 				}
 
-				// Re-throw already properly formatted errors
-				if (error instanceof NodeOperationError || error instanceof NodeApiError) {
-					// eslint-disable-next-line @n8n/community-nodes/require-node-api-error -- error is already a NodeOperationError/NodeApiError
-					throw error;
-				}
-
-				// Handle different types of errors appropriately
-				if (error && typeof error === 'object' && 'httpCode' in error) {
-					// This is an API error
-					throw new NodeApiError(this.getNode(), error as JsonObject, {
-						message: 'API Error',
-						description:
-							(error as Error).message || 'An unexpected error occurred with the Carbone API.',
-					});
-				} else {
-					// This is an operational error
-					throw new NodeOperationError(
-						this.getNode(),
-						error instanceof Error ? error.message : String(error),
-						{
-							itemIndex: i,
-						},
-					);
-				}
+				// Already typed errors pass through, anything else is wrapped into a NodeApiError
+				throw CarboneErrorHandler.handleApiError(error, this.getNode());
 			}
 		}
 

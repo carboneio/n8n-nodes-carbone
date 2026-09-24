@@ -61,18 +61,18 @@ export class TemplateOperations {
 	}
 
 	private static parseResponse(response: unknown): unknown {
-		// Parser la réponse JSON si c'est une chaîne pour éviter le double encodage
+		// Parse string responses to avoid double encoded JSON
 		let parsedResponse: unknown = response;
 		if (typeof response === 'string') {
 			try {
 				parsedResponse = JSON.parse(response);
 			} catch {
-				// Si le parsing échoue, utiliser la réponse originale
+				// Keep the original response when parsing fails
 				return response;
 			}
 		}
 
-		// Si la réponse contient un tableau de données, convertir les timestamps en dates ISO
+		// Map list responses: timestamps to ISO dates and origin codes to labels
 		if (parsedResponse && typeof parsedResponse === 'object' && 'data' in parsedResponse) {
 			const templateResponse = parsedResponse as TemplateResponse;
 			if (Array.isArray(templateResponse.data)) {
@@ -233,10 +233,10 @@ export class TemplateOperations {
 		const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
 		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
 
-		// Valider les données binaires
+		// Validate the binary input
 		this.helpers.assertBinaryData(i, binaryPropertyName);
 
-		// Récupérer les informations du fichier binaire
+		// Read the binary file info
 		const binaryData = this.getInputData()[i].binary;
 		if (!binaryData) {
 			throw new NodeOperationError(this.getNode(), 'No binary data found', {

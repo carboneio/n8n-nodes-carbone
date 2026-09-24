@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { IDataObject } from 'n8n-workflow';
-import { NodeApiError } from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
 import { ConvertOperations } from '../nodes/Carbone/resources/ConvertDocument/ConvertOperations';
 import { createExecuteFunctionsMock, requestOptions } from './helpers';
 
@@ -64,7 +64,7 @@ describe('convertHtmlToPdf', () => {
 		const { mock, httpRequest } = createExecuteFunctionsMock({
 			parameters: { htmlSource: 'carrier-pigeon' },
 		});
-		await expect(convertOps.convertHtmlToPdf.call(mock, 0)).rejects.toThrow(NodeApiError);
+		await expect(convertOps.convertHtmlToPdf.call(mock, 0)).rejects.toThrow(NodeOperationError);
 		expect(httpRequest).not.toHaveBeenCalled();
 	});
 });
