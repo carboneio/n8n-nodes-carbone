@@ -5,12 +5,7 @@ import {
 	IDataObject,
 } from 'n8n-workflow';
 import { CarboneErrorHandler } from '../../utils/errorHandler';
-
-interface CarboneCredentials {
-	apiKey: string;
-	apiUrl: string;
-	carboneVersion: string;
-}
+import { carboneApiRequest } from '../../utils/carboneApiRequest';
 
 interface GenerateOptions {
 	timezone?: string;
@@ -127,8 +122,6 @@ export class RenderOperations {
 			{},
 		) as GenerateOptions;
 
-		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
-
 		// Accept the data as a JSON string or as an object
 		if (typeof data === 'string') {
 			try {
@@ -183,12 +176,12 @@ export class RenderOperations {
 		}
 
 		// Build URL and body based on template source
-		let apiUrl: string;
+		let path: string;
 		if (templateSource === 'templateId') {
-			apiUrl = `${credentials.apiUrl}/render/${templateId}`;
+			path = `/render/${templateId}`;
 		} else {
 			requestBody.template = templateBase64;
-			apiUrl = `${credentials.apiUrl}/render/template`;
+			path = '/render/template';
 		}
 
 		const webhookUrl = additionalOptions?.webhookUrl;
@@ -202,9 +195,9 @@ export class RenderOperations {
 		try {
 			if (!returnRenderId && !webhookUrl) {
 				// Download the file directly (?download=true)
-				const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+				const response = await carboneApiRequest.call(this, {
 					method: 'POST',
-					url: apiUrl,
+					url: path,
 					qs: {
 						download: 'true',
 					},
@@ -252,9 +245,9 @@ export class RenderOperations {
 					}
 				}
 
-				const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+				const response = await carboneApiRequest.call(this, {
 					method: 'POST',
-					url: apiUrl,
+					url: path,
 					headers,
 					body: requestBody,
 				});
@@ -274,12 +267,10 @@ export class RenderOperations {
 
 	async getDocument(this: IExecuteFunctions, i: number): Promise<INodeExecutionData> {
 		const renderId = this.getNodeParameter('renderId', i) as string;
-		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
-
 		try {
-			const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+			const response = await carboneApiRequest.call(this, {
 				method: 'GET',
-				url: `${credentials.apiUrl}/render/${renderId}`,
+				url: `/render/${renderId}`,
 				returnFullResponse: true,
 				encoding: 'arraybuffer',
 			});

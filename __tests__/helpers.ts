@@ -4,7 +4,7 @@ import type { IExecuteFunctions, IDataObject } from 'n8n-workflow';
 export interface MockOptions {
 	/** Node parameters, keyed by parameter name. Missing keys resolve to the call's fallback value. */
 	parameters?: IDataObject;
-	/** Credentials returned by getCredentials('carboneApi') */
+	/** Credentials returned by getCredentials (API key or OAuth2) */
 	credentials?: IDataObject;
 	/** Value resolved by helpers.httpRequestWithAuthentication (or an array: one value per call) */
 	response?: unknown;

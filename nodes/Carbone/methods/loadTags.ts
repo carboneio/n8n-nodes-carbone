@@ -1,13 +1,12 @@
 import type { ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
+import { carboneApiRequest } from '../utils/carboneApiRequest';
 
 export async function loadTags(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-	const credentials = await this.getCredentials('carboneApi');
-
 	try {
-		const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+		const response = await carboneApiRequest.call(this, {
 			method: 'GET',
-			url: `${credentials.apiUrl}/templates/tags`,
+			url: '/templates/tags',
 			json: true,
 		});
 

@@ -49,6 +49,12 @@ export class Carbone implements INodeType {
 			{
 				name: 'carboneApi',
 				required: true,
+				displayOptions: { show: { authentication: ['apiKey'] } },
+			},
+			{
+				name: 'carboneOAuth2Api',
+				required: true,
+				displayOptions: { show: { authentication: ['oAuth2'] } },
 			},
 		],
 		requestDefaults: {
@@ -59,6 +65,24 @@ export class Carbone implements INodeType {
 			},
 		},
 		properties: [
+			{
+				displayName: 'Authentication',
+				name: 'authentication',
+				type: 'options',
+				options: [
+					{
+						name: 'OAuth2',
+						value: 'oAuth2',
+						description: 'Sign in with your Carbone account (Carbone Cloud only)',
+					},
+					{
+						name: 'API Key',
+						value: 'apiKey',
+						description: 'Carbone Cloud API key, or none for an On-Premise instance',
+					},
+				],
+				default: 'apiKey',
+			},
 			// Unified resource selector
 			...resource,
 			...convertOperations,

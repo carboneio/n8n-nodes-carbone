@@ -5,13 +5,7 @@ import {
 	IDataObject,
 } from 'n8n-workflow';
 import { CarboneErrorHandler } from '../../utils/errorHandler';
-
-
-interface CarboneCredentials {
-	apiKey: string;
-	apiUrl: string;
-	carboneVersion: string;
-}
+import { carboneApiRequest } from '../../utils/carboneApiRequest';
 
 interface TemplateUploadOptions {
 	versioning?: boolean;
@@ -106,12 +100,10 @@ export class TemplateOperations {
 	}
 
 	async listCategories(this: IExecuteFunctions, i: number): Promise<INodeExecutionData> {
-		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
-
 		try {
-			const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+			const response = await carboneApiRequest.call(this, {
 				method: 'GET',
-				url: `${credentials.apiUrl}/templates/categories`,
+				url: '/templates/categories',
 			});
 
 			return {
@@ -124,12 +116,10 @@ export class TemplateOperations {
 	}
 
 	async listTags(this: IExecuteFunctions, i: number): Promise<INodeExecutionData> {
-		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
-
 		try {
-			const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+			const response = await carboneApiRequest.call(this, {
 				method: 'GET',
-				url: `${credentials.apiUrl}/templates/tags`,
+				url: '/templates/tags',
 			});
 
 			return {
@@ -146,8 +136,6 @@ export class TemplateOperations {
 			extractValue: true,
 		}) as string;
 		const updateFields = this.getNodeParameter('updateFields', i, {}) as TemplateUpdateFields;
-		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
-
 		const body: Record<string, unknown> = {};
 		if (updateFields.id) body.id = updateFields.id;
 		if (updateFields.name) body.name = updateFields.name;
@@ -169,9 +157,9 @@ export class TemplateOperations {
 		}
 
 		try {
-			const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+			const response = await carboneApiRequest.call(this, {
 				method: 'PATCH',
-				url: `${credentials.apiUrl}/template/${templateId}`,
+				url: `/template/${templateId}`,
 				headers: { 'Content-Type': 'application/json' },
 				body,
 			});
@@ -186,8 +174,6 @@ export class TemplateOperations {
 	}
 
 	async listTemplates(this: IExecuteFunctions, i: number): Promise<INodeExecutionData> {
-		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
-
 		// Get all list parameters
 		const id = this.getNodeParameter('id', i, '') as string;
 		const versionId = this.getNodeParameter('versionId', i, '') as string;
@@ -211,9 +197,9 @@ export class TemplateOperations {
 
 		try {
 			// Make the request to list templates using modern authentication helper
-			const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+			const response = await carboneApiRequest.call(this, {
 				method: 'GET',
-				url: `${credentials.apiUrl}/templates`,
+				url: '/templates',
 				qs: qs,
 			});
 
@@ -231,8 +217,6 @@ export class TemplateOperations {
 
 	async uploadTemplate(this: IExecuteFunctions, i: number): Promise<INodeExecutionData> {
 		const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
-		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
-
 		// Validate the binary input
 		this.helpers.assertBinaryData(i, binaryPropertyName);
 
@@ -322,9 +306,9 @@ export class TemplateOperations {
 		}
 
 		try {
-			const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+			const response = await carboneApiRequest.call(this, {
 				method: 'POST',
-				url: `${credentials.apiUrl}/template`,
+				url: '/template',
 				headers: { 'Content-Type': 'application/json' },
 				body,
 			});
@@ -345,12 +329,10 @@ export class TemplateOperations {
 		const templateId = this.getNodeParameter('templateId', i, undefined, {
 			extractValue: true,
 		}) as string;
-		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
-
 		try {
-			const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+			const response = await carboneApiRequest.call(this, {
 				method: 'GET',
-				url: `${credentials.apiUrl}/template/${templateId}`,
+				url: `/template/${templateId}`,
 				returnFullResponse: true,
 				encoding: 'arraybuffer',
 			});
@@ -386,12 +368,10 @@ export class TemplateOperations {
 		const templateId = this.getNodeParameter('templateId', i, undefined, {
 			extractValue: true,
 		}) as string;
-		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
-
 		try {
-			const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+			const response = await carboneApiRequest.call(this, {
 				method: 'DELETE',
-				url: `${credentials.apiUrl}/template/${templateId}`,
+				url: `/template/${templateId}`,
 			});
 
 			return {

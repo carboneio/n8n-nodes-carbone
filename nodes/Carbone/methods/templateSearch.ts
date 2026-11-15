@@ -1,21 +1,20 @@
 import type { ILoadOptionsFunctions, INodeListSearchResult } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
+import { carboneApiRequest } from '../utils/carboneApiRequest';
 
 export async function templateSearch(
 	this: ILoadOptionsFunctions,
 	filter?: string,
 ): Promise<INodeListSearchResult> {
-	const credentials = await this.getCredentials('carboneApi');
-
 	try {
 		const qs: Record<string, string> = {};
 		if (filter) {
 			qs.search = filter;
 		}
 
-		const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+		const response = await carboneApiRequest.call(this, {
 			method: 'GET',
-			url: `${credentials.apiUrl}/templates`,
+			url: '/templates',
 			qs,
 			json: true,
 		});

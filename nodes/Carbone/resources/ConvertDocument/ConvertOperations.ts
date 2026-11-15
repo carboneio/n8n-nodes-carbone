@@ -5,12 +5,7 @@ import {
 	IDataObject,
 } from 'n8n-workflow';
 import { CarboneErrorHandler } from '../../utils/errorHandler';
-
-interface CarboneCredentials {
-	apiKey: string;
-	apiUrl: string;
-	carboneVersion: string;
-}
+import { carboneApiRequest } from '../../utils/carboneApiRequest';
 
 // Converts an ArrayBuffer to a base64 string without the Node.js Buffer global
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
@@ -42,8 +37,6 @@ export class ConvertOperations {
 		base64: string,
 		converter?: string,
 	): Promise<INodeExecutionData> {
-		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
-
 		const requestBody: Record<string, unknown> = {
 			data: {},
 			template: base64,
@@ -54,9 +47,9 @@ export class ConvertOperations {
 			requestBody.converter = converter;
 		}
 
-		const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+		const response = await carboneApiRequest.call(this, {
 			method: 'POST',
-			url: `${credentials.apiUrl}/render/template`,
+			url: '/render/template',
 			qs: { download: 'true' },
 			headers: { 'Content-Type': 'application/json' },
 			body: requestBody,
@@ -109,11 +102,9 @@ export class ConvertOperations {
 		const templateId = this.getNodeParameter('templateId', i, undefined, {
 			extractValue: true,
 		}) as string;
-		const credentials = (await this.getCredentials('carboneApi')) as CarboneCredentials;
-
-		const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+		const response = await carboneApiRequest.call(this, {
 			method: 'GET',
-			url: `${credentials.apiUrl}/template/${templateId}`,
+			url: `/template/${templateId}`,
 			encoding: 'arraybuffer',
 		});
 

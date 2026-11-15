@@ -1,15 +1,12 @@
 import type { ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
+import { carboneApiRequest } from '../utils/carboneApiRequest';
 
-export async function loadCategories(
-	this: ILoadOptionsFunctions,
-): Promise<INodePropertyOptions[]> {
-	const credentials = await this.getCredentials('carboneApi');
-
+export async function loadCategories(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 	try {
-		const response = await this.helpers.httpRequestWithAuthentication.call(this, 'carboneApi', {
+		const response = await carboneApiRequest.call(this, {
 			method: 'GET',
-			url: `${credentials.apiUrl}/templates/categories`,
+			url: '/templates/categories',
 			json: true,
 		});
 
@@ -20,10 +17,8 @@ export async function loadCategories(
 			...categories.map((cat) => ({ name: cat.name, value: cat.name })),
 		];
 	} catch {
-		throw new NodeOperationError(
-			this.getNode(),
-			'Failed to fetch categories from Carbone API',
-			{ level: 'warning' },
-		);
+		throw new NodeOperationError(this.getNode(), 'Failed to fetch categories from Carbone API', {
+			level: 'warning',
+		});
 	}
 }
