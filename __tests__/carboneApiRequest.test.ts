@@ -46,6 +46,25 @@ describe('carboneApiRequest', () => {
 	});
 });
 
+describe('carboneApiRequest - API URL', () => {
+	it.each(['https://carbone.local', 'https://carbone.local/', 'https://carbone.local//'])(
+		'joins %s and the path with exactly one slash',
+		async (apiUrl) => {
+			const { mock, httpRequest } = createExecuteFunctionsMock({ credentials: { apiUrl } });
+			await carboneApiRequest.call(mock, { method: 'GET', url: '/templates' });
+			expect(requestOptions(httpRequest).url).toBe('https://carbone.local/templates');
+		},
+	);
+
+	it('keeps a path prefix of an On-Premise API URL', async () => {
+		const { mock, httpRequest } = createExecuteFunctionsMock({
+			credentials: { apiUrl: 'https://intranet.example.com/carbone/' },
+		});
+		await carboneApiRequest.call(mock, { method: 'GET', url: '/templates' });
+		expect(requestOptions(httpRequest).url).toBe('https://intranet.example.com/carbone/templates');
+	});
+});
+
 describe('CarboneOAuth2Api credential', () => {
 	it('pins Carbone Account, the doc_rwd scope and Carbone Cloud, and leaves Client ID/Secret to n8n', () => {
 		const credential = new CarboneOAuth2Api();

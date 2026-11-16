@@ -5,7 +5,7 @@ import {
 	IDataObject,
 } from 'n8n-workflow';
 import { CarboneErrorHandler } from '../../utils/errorHandler';
-import { carboneApiRequest } from '../../utils/carboneApiRequest';
+import { carboneApiRequest, pathSegment } from '../../utils/carboneApiRequest';
 
 interface GenerateOptions {
 	timezone?: string;
@@ -178,7 +178,7 @@ export class RenderOperations {
 		// Build URL and body based on template source
 		let path: string;
 		if (templateSource === 'templateId') {
-			path = `/render/${templateId}`;
+			path = `/render/${pathSegment.call(this, templateId as string)}`;
 		} else {
 			requestBody.template = templateBase64;
 			path = '/render/template';
@@ -270,7 +270,7 @@ export class RenderOperations {
 		try {
 			const response = await carboneApiRequest.call(this, {
 				method: 'GET',
-				url: `/render/${renderId}`,
+				url: `/render/${pathSegment.call(this, renderId)}`,
 				returnFullResponse: true,
 				encoding: 'arraybuffer',
 			});

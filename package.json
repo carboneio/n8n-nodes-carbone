@@ -71,14 +71,14 @@
     "strict": true
   },
   "devDependencies": {
-    "@n8n/node-cli": "^0.49.1",
-    "@types/node": "^26.6.2",
-    "@vitest/coverage-v8": "^5.0.1",
+    "@n8n/node-cli": "^0.56.4",
+    "@types/node": "^26.6.6",
+    "@vitest/coverage-v8": "^5.1.0",
     "eslint": "^9.39.5",
-    "eslint-plugin-n8n-nodes-base": "^1.16.7",
-    "prettier": "^3.9.9",
+    "eslint-plugin-n8n-nodes-base": "^2.0.0",
+    "prettier": "^3.10.1",
     "typescript": "^5.9.3",
-    "vitest": "^5.0.1"
+    "vitest": "^5.1.0"
   },
   "peerDependencies": {
     "n8n-workflow": "*"

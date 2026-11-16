@@ -5,7 +5,7 @@ import {
 	IDataObject,
 } from 'n8n-workflow';
 import { CarboneErrorHandler } from '../../utils/errorHandler';
-import { carboneApiRequest } from '../../utils/carboneApiRequest';
+import { carboneApiRequest, pathSegment } from '../../utils/carboneApiRequest';
 
 interface TemplateUploadOptions {
 	versioning?: boolean;
@@ -159,7 +159,7 @@ export class TemplateOperations {
 		try {
 			const response = await carboneApiRequest.call(this, {
 				method: 'PATCH',
-				url: `/template/${templateId}`,
+				url: `/template/${pathSegment.call(this, templateId)}`,
 				headers: { 'Content-Type': 'application/json' },
 				body,
 			});
@@ -332,7 +332,7 @@ export class TemplateOperations {
 		try {
 			const response = await carboneApiRequest.call(this, {
 				method: 'GET',
-				url: `/template/${templateId}`,
+				url: `/template/${pathSegment.call(this, templateId)}`,
 				returnFullResponse: true,
 				encoding: 'arraybuffer',
 			});
@@ -371,7 +371,7 @@ export class TemplateOperations {
 		try {
 			const response = await carboneApiRequest.call(this, {
 				method: 'DELETE',
-				url: `/template/${templateId}`,
+				url: `/template/${pathSegment.call(this, templateId)}`,
 			});
 
 			return {

@@ -5,7 +5,7 @@ import {
 	IDataObject,
 } from 'n8n-workflow';
 import { CarboneErrorHandler } from '../../utils/errorHandler';
-import { carboneApiRequest } from '../../utils/carboneApiRequest';
+import { carboneApiRequest, pathSegment } from '../../utils/carboneApiRequest';
 
 // Converts an ArrayBuffer to a base64 string without the Node.js Buffer global
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
@@ -104,7 +104,7 @@ export class ConvertOperations {
 		}) as string;
 		const response = await carboneApiRequest.call(this, {
 			method: 'GET',
-			url: `/template/${templateId}`,
+			url: `/template/${pathSegment.call(this, templateId)}`,
 			encoding: 'arraybuffer',
 		});
 

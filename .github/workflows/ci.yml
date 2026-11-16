@@ -24,8 +24,10 @@ jobs:
           node-version: 'lts/*'
           cache: 'npm'
 
+      # No install scripts: none is needed to lint, test or build, and the native isolated-vm
+      # pulled in by the n8n-workflow peer does not compile on recent Node versions.
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
       - name: Run lint
         run: npm run lint

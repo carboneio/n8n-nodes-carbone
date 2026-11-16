@@ -57,13 +57,6 @@ export class Carbone implements INodeType {
 				displayOptions: { show: { authentication: ['oAuth2'] } },
 			},
 		],
-		requestDefaults: {
-			baseURL: '={{$credentials.apiUrl}}',
-			url: '',
-			headers: {
-				Accept: 'application/json',
-			},
-		},
 		properties: [
 			{
 				displayName: 'Authentication',
