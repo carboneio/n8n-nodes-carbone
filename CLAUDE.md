@@ -7,7 +7,7 @@
 - **Composants principaux** :
   - Node principal: `Carbone` dans `nodes/Carbone/`
   - Credentials dans `credentials/` : `CarboneApi` (clé API, Cloud et On-Premise) et `CarboneOAuth2Api` (OAuth2, Cloud uniquement), choisis par le paramètre `authentication` du nœud (`apiKey` par défaut)
-  - Tous les appels API passent par `utils/carboneApiRequest.ts` : il résout le credential, préfixe le chemin avec `apiUrl` et envoie `carbone-version: 5` (n8n ignore le bloc `authenticate` d'un credential OAuth2)
+  - Tous les appels API passent par `utils/carboneApiRequest.ts` : il résout le credential, préfixe le chemin avec `apiUrl` (clé API) ou `https://api.carbone.io` en dur (OAuth2 : le jeton Cloud ne part jamais vers une URL stockée) et envoie `carbone-version: 5` (n8n ignore le bloc `authenticate` d'un credential OAuth2)
   - **Nouvelle structure modulaire** :
     - `CarboneDescription.ts` - Point d'entrée pour les imports des descriptions
     - **Ressources organisées par domaine** :
@@ -104,9 +104,9 @@
   - **Décision produit (nouvelle version de l'API, ex. Carbone 6)** : paramètre de nœud « Carbone API Version » avec une valeur par défaut par version du nœud (`displayOptions.show['@version']`). Les nœuds existants (typeVersion 1) restent sur `5` et peuvent choisir `6` ; un nouveau nœud (typeVersion 1.1, `defaultVersion`) part sur la dernière version. Le header a alors un seul propriétaire, le nœud : retirer `carbone-version` du bloc `authenticate` de `CarboneApi` (sinon le credential, partagé entre workflows, écrase le choix du nœud) et l'ajouter à sa requête `test`
   - Credential `apiKey`: optionnel - les instances On-Premise sans authentification doivent fonctionner (ne pas mettre `required: true`)
 - **Authentification**: Bearer token via header `Authorization`
-- **OAuth2 (`CarboneOAuth2Api`)** : extends `oAuth2Api`, schéma des Managed OAuth Guidelines de n8n (champs cachés `grantType`, `authUrl`, `accessTokenUrl`, `scope: doc_rwd`, `authQueryParameters`, `authentication: header`, plus `serverUrl` et `apiUrl`), `clientId`/`clientSecret` hérités
+- **OAuth2 (`CarboneOAuth2Api`)** : extends `oAuth2Api`, schéma des Managed OAuth Guidelines de n8n (champs cachés `grantType`, `authUrl`, `accessTokenUrl`, `scope: doc_rwd`, `authQueryParameters`, `authentication: header`, plus `serverUrl` ; pas d'`apiUrl`), `clientId`/`clientSecret` hérités
   - **n8n Cloud**: n8n uses Carbone's managed OAuth app
-  - Auto-hébergé n8n >= 3.2 : le champ de classe `dynamicClientRegistration = true` active le DCR automatique (RFC 7591 + PKCE, `client_name` "n8n") quand aucun client géré n'existe ; avant 3.2, clé API
+  - Auto-hébergé n8n >= 2.49 (lu par `credentials-helper` à partir de 2.49.0, absent de 2.48.4) : le champ de classe `dynamicClientRegistration = true` active le DCR automatique (RFC 7591 + PKCE, `client_name` "n8n") quand aucun client géré n'existe ; avant 2.49, clé API
   - **Ne jamais ajouter de champ caché `useDynamicClientRegistration: true`** : n8n remplacerait le client géré par le client enregistré
 - **Host**: api.carbone.io (HTTPS)
 

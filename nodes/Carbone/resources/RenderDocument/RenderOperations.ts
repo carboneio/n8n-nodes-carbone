@@ -44,10 +44,7 @@ export class RenderOperations {
 	}
 
 	// Builds the formatOptions object, or returns undefined so the plain string convertTo is sent
-	private static buildFormatOptions(
-		raw: IDataObject,
-		convertTo: string,
-	): IDataObject | undefined {
+	private static buildFormatOptions(raw: IDataObject, convertTo: string): IDataObject | undefined {
 		if (!FORMAT_OPTIONS_FORMATS.includes(convertTo)) {
 			return undefined;
 		}
@@ -90,8 +87,7 @@ export class RenderOperations {
 	async generateDocument(this: IExecuteFunctions, i: number): Promise<INodeExecutionData> {
 		// v1.x workflows stored templateSource as a boolean (false = template ID, true = base64)
 		const rawTemplateSource = this.getNodeParameter('templateSource', i, 'templateId') as
-			| string
-			| boolean;
+			string | boolean;
 		const templateSource =
 			rawTemplateSource === false
 				? 'templateId'
@@ -140,9 +136,7 @@ export class RenderOperations {
 		if (convertTo) {
 			const formatOptionsRaw = this.getNodeParameter('formatOptions', i, {}) as IDataObject;
 			const formatOptions = RenderOperations.buildFormatOptions(formatOptionsRaw, convertTo);
-			requestBody.convertTo = formatOptions
-				? { formatName: convertTo, formatOptions }
-				: convertTo;
+			requestBody.convertTo = formatOptions ? { formatName: convertTo, formatOptions } : convertTo;
 		}
 
 		if (converter) {

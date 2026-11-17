@@ -7,15 +7,18 @@ import {
 
 /**
  * Sends a request to the Carbone API with the credential selected by the node's Authentication
- * parameter. `options.url` is a path (e.g. `/templates`), resolved against the credential's API URL.
+ * parameter. `options.url` is a path (e.g. `/templates`), resolved against the API URL.
  */
 export async function carboneApiRequest(
 	this: IExecuteFunctions | ILoadOptionsFunctions,
 	options: IHttpRequestOptions,
 ) {
-	const credentialType =
-		this.getNodeParameter('authentication', 0) === 'oAuth2' ? 'carboneOAuth2Api' : 'carboneApi';
-	const { apiUrl } = await this.getCredentials(credentialType);
+	const isOAuth2 = this.getNodeParameter('authentication', 0) === 'oAuth2';
+	const credentialType = isOAuth2 ? 'carboneOAuth2Api' : 'carboneApi';
+	// An OAuth2 token is a Carbone Cloud token: it is never sent anywhere else, whatever the credential holds
+	const apiUrl = isOAuth2
+		? 'https://api.carbone.io'
+		: (await this.getCredentials(credentialType)).apiUrl;
 
 	return await this.helpers.httpRequestWithAuthentication.call(this, credentialType, {
 		...options,

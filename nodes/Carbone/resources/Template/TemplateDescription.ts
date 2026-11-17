@@ -517,7 +517,8 @@ export const uploadCategoryField: INodeProperties[] = [
 		name: 'category',
 		type: 'options',
 		default: '',
-		description: 'Group the template into a category (similar to a folder). Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a> to create a new one, e.g. <code>{{ "My New Category" }}</code>. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+		description:
+			'Group the template into a category (similar to a folder). Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a> to create a new one, e.g. <code>{{ "My New Category" }}</code>. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 		displayOptions: {
 			show: {
 				resource: ['template'],
@@ -536,7 +537,8 @@ export const updateCategoryField: INodeProperties[] = [
 		name: 'category',
 		type: 'options',
 		default: '',
-		description: 'Group the template into a category (similar to a folder). Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a> to create a new one, e.g. <code>{{ "My New Category" }}</code>. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+		description:
+			'Group the template into a category (similar to a folder). Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a> to create a new one, e.g. <code>{{ "My New Category" }}</code>. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 		displayOptions: {
 			show: {
 				resource: ['template'],
@@ -555,7 +557,8 @@ export const listCategoryField: INodeProperties[] = [
 		name: 'category',
 		type: 'options',
 		default: '',
-		description: 'Filter templates by category. Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a>. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+		description:
+			'Filter templates by category. Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a>. Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 		displayOptions: {
 			show: {
 				resource: ['template'],
@@ -574,7 +577,8 @@ export const uploadTagsField: INodeProperties[] = [
 		name: 'tags',
 		type: 'multiOptions',
 		default: [],
-		description: 'Tags to assign to the template. Duplicates are removed and the list is returned sorted alphabetically; the whole list is limited to 100 characters. Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a> to set new or mixed tags, e.g. <code>{{ ["invoices", "2024"] }}</code>. Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+		description:
+			'Tags to assign to the template. Duplicates are removed and the list is returned sorted alphabetically; the whole list is limited to 100 characters. Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a> to set new or mixed tags, e.g. <code>{{ ["invoices", "2024"] }}</code>. Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 		displayOptions: {
 			show: {
 				resource: ['template'],
@@ -593,7 +597,8 @@ export const updateTagsField: INodeProperties[] = [
 		name: 'tags',
 		type: 'multiOptions',
 		default: [],
-		description: 'Tags to assign to the template. Duplicates are removed and the list is returned sorted alphabetically; the whole list is limited to 100 characters. Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a> to set new or mixed tags, e.g. <code>{{ ["invoices", "2024"] }}</code>. Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+		description:
+			'Tags to assign to the template. Duplicates are removed and the list is returned sorted alphabetically; the whole list is limited to 100 characters. Choose from the list, or use an <a href="https://docs.n8n.io/data/expression-reference/">expression</a> to set new or mixed tags, e.g. <code>{{ ["invoices", "2024"] }}</code>. Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
 		displayOptions: {
 			show: {
 				resource: ['template'],

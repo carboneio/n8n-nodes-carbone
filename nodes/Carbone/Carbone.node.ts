@@ -64,14 +64,15 @@ export class Carbone implements INodeType {
 				type: 'options',
 				options: [
 					{
-						name: 'OAuth2',
-						value: 'oAuth2',
-						description: 'Sign in with your Carbone account (Carbone Cloud only)',
-					},
-					{
 						name: 'API Key',
 						value: 'apiKey',
 						description: 'Carbone Cloud API key, or none for an On-Premise instance',
+					},
+					{
+						name: 'OAuth2',
+						value: 'oAuth2',
+						description:
+							'Sign in with your Carbone account (Carbone Cloud only). Requires n8n Cloud or self-hosted n8n 2.49+.',
 					},
 				],
 				default: 'apiKey',

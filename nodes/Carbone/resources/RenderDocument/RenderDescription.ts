@@ -23,7 +23,8 @@ export const renderOperations: INodeProperties[] = [
 				name: 'Download Document',
 				value: 'get',
 				action: 'Download generated document',
-				description: 'Download a document previously generated using its Render ID. Use this after a "Generate" with "Return Render ID" enabled or an asynchronous webhook generation.',
+				description:
+					'Download a document previously generated using its Render ID. Use this after a "Generate" with "Return Render ID" enabled or an asynchronous webhook generation.',
 			},
 		],
 		default: 'generate',
@@ -133,7 +134,8 @@ export const generateOperation: INodeProperties[] = [
 		type: 'json',
 		required: true,
 		default: '{}',
-		description: 'Data merged into the template to generate a document. Data is accessible in the template using {d.} (e.g. {d.firstName}).',
+		description:
+			'Data merged into the template to generate a document. Data is accessible in the template using {d.} (e.g. {d.firstName}).',
 		displayOptions: {
 			show: {
 				resource: ['renderDocument'],
@@ -146,7 +148,8 @@ export const generateOperation: INodeProperties[] = [
 		name: 'convertTo',
 		type: 'options',
 		default: '',
-		description: 'Convert the document into another format. Select "Same as Template" to keep the original format.',
+		description:
+			'Convert the document into another format. Select "Same as Template" to keep the original format.',
 		displayOptions: {
 			show: {
 				resource: ['renderDocument'],
@@ -314,8 +317,7 @@ export const generateOperation: INodeProperties[] = [
 		name: 'returnRenderId',
 		type: 'boolean',
 		default: false,
-		description:
-			'Whether to return a unique Render ID instead of the file itself',
+		description: 'Whether to return a unique Render ID instead of the file itself',
 		hint: 'If enabled, the node returns a Render ID instead of the file. Use the Render ID with the "Download Document" action to download the file. Note: the generated document is only available for one hour and can be downloaded once. If a "Webhook URL" is set in the options, the generation is asynchronous and the node returns JSON regardless of this toggle.',
 		displayOptions: {
 			show: {
@@ -384,7 +386,8 @@ export const generateAdditionalOptions: INodeProperties[] = [
 				type: 'string',
 				default: '',
 				placeholder: 'e.g. report-{d.ID}',
-				description: 'Name of each file inside the ZIP batch export. Supports Carbone tags using relative or absolute JSON paths (e.g. "report-{d.ID}"). Used together with "Batch Split By"; ignored when "Batch Output" is "pdf". An index is appended (report_1.pdf, report_2.pdf) as soon as two reports resolve to the same name.',
+				description:
+					'Name of each file inside the ZIP batch export. Supports Carbone tags using relative or absolute JSON paths (e.g. "report-{d.ID}"). Used together with "Batch Split By"; ignored when "Batch Output" is "pdf". An index is appended (report_1.pdf, report_2.pdf) as soon as two reports resolve to the same name.',
 			},
 			{
 				displayName: 'Batch Split By',
@@ -403,7 +406,7 @@ export const generateAdditionalOptions: INodeProperties[] = [
 				description:
 					'Extra data merged into the template. Complement data is accessible in the template using {c.} (e.g. {c.companyName}).',
 			},
-				{
+			{
 				displayName: 'Currency Rates',
 				name: 'currencyRates',
 				type: 'json',

@@ -95,10 +95,7 @@ export class ConvertOperations {
 	}
 
 	// Downloads a template by ID from Carbone and returns its content as base64
-	private async downloadTemplateAsBase64(
-		this: IExecuteFunctions,
-		i: number,
-	): Promise<string> {
+	private async downloadTemplateAsBase64(this: IExecuteFunctions, i: number): Promise<string> {
 		const templateId = this.getNodeParameter('templateId', i, undefined, {
 			extractValue: true,
 		}) as string;
@@ -134,11 +131,9 @@ export class ConvertOperations {
 				const rawHtml = this.getNodeParameter('rawHtml', i) as string;
 				base64 = stringToBase64(rawHtml);
 			} else {
-				throw new NodeOperationError(
-					this.getNode(),
-					`Unknown HTML source: ${htmlSource}`,
-					{ itemIndex: i },
-				);
+				throw new NodeOperationError(this.getNode(), `Unknown HTML source: ${htmlSource}`, {
+					itemIndex: i,
+				});
 			}
 
 			// HTML → PDF always uses Chromium converter
@@ -161,11 +156,9 @@ export class ConvertOperations {
 			} else if (officeSource === 'templateId') {
 				base64 = await ops.downloadTemplateAsBase64.call(this, i);
 			} else {
-				throw new NodeOperationError(
-					this.getNode(),
-					`Unknown Office source: ${officeSource}`,
-					{ itemIndex: i },
-				);
+				throw new NodeOperationError(this.getNode(), `Unknown Office source: ${officeSource}`, {
+					itemIndex: i,
+				});
 			}
 
 			return await ops.callRenderTemplate.call(this, i, base64, converter);

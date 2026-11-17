@@ -167,20 +167,22 @@ To use the Carbone.io node, you need to authenticate with your Carbone.io accoun
 ### Prerequisites
 Sign up for a Carbone.io account at [carbone.io](https://carbone.io/).
 
+### API Key
+1. **API Key**: Your Carbone.io API key, from your Carbone.io dashboard. Optional for On-Premise instances that do not require authentication
+2. **API URL**: The base URL for Carbone.io API (default: https://api.carbone.io)
+   - Change this if you're using a self-hosted instance
+3. **Carbone API Version**: 5
+
 ### OAuth2 (one click, Carbone Cloud)
 1. Set **Authentication** to **OAuth2** and create a **Carbone OAuth2 API** credential
 2. Click **Connect**, sign in to Carbone and approve the access (a workspace admin must approve)
 
 No API key to copy, and n8n refreshes the access token on its own:
 - **n8n Cloud**: n8n uses Carbone's managed OAuth app
-- **Self-hosted n8n 3.2 or later**: n8n registers itself on Carbone Account automatically (Dynamic Client Registration with PKCE). The instance must be reachable over HTTPS (or `localhost`)
+- **Self-hosted n8n 2.49 or later**: n8n registers itself on Carbone Account automatically (Dynamic Client Registration with PKCE). The instance must be reachable over HTTPS (or `localhost`)
 - **Older self-hosted versions**: use an API key
 
-### API Key
-1. **API Key**: Your Carbone.io API key, from your Carbone.io dashboard. Optional for On-Premise instances that do not require authentication
-2. **API URL**: The base URL for Carbone.io API (default: https://api.carbone.io)
-   - Change this if you're using a self-hosted instance
-3. **Carbone API Version**: 5
+The token renders every format without watermark when your Carbone subscription is active. Otherwise it is a test token: PDF only, with a Carbone watermark.
 
 
 ## Development

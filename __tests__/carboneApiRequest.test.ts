@@ -24,14 +24,20 @@ describe('carboneApiRequest', () => {
 	});
 
 	it('uses the OAuth2 credential when selected', async () => {
-		const { mock, httpRequest, getCredentials } = mockWith('oAuth2');
+		const { mock, httpRequest } = mockWith('oAuth2');
 		await carboneApiRequest.call(mock, { method: 'GET', url: '/templates' });
-		expect(getCredentials).toHaveBeenCalledWith('carboneOAuth2Api');
 		expect(httpRequest.mock.calls[0][0]).toBe('carboneOAuth2Api');
 	});
 
+	it('sends the OAuth2 token to Carbone Cloud only, never to a URL stored in the credential', async () => {
+		const { mock, httpRequest, getCredentials } = mockWith('oAuth2');
+		await carboneApiRequest.call(mock, { method: 'GET', url: '/templates' });
+		expect(getCredentials).not.toHaveBeenCalled();
+		expect(requestOptions(httpRequest).url).toBe('https://api.carbone.io/templates');
+	});
+
 	it('resolves the path against the API URL and always sends the API version', async () => {
-		const { mock, httpRequest } = mockWith('oAuth2');
+		const { mock, httpRequest } = mockWith('apiKey');
 		await carboneApiRequest.call(mock, {
 			method: 'POST',
 			url: '/render/template',
@@ -79,7 +85,6 @@ describe('CarboneOAuth2Api credential', () => {
 			scope: ['hidden', 'doc_rwd'],
 			authQueryParameters: ['hidden', ''],
 			authentication: ['hidden', 'header'],
-			apiUrl: ['hidden', 'https://api.carbone.io'],
 		});
 	});
 

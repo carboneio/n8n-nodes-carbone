@@ -2,7 +2,7 @@ import type { ICredentialType, INodeProperties, Icon } from 'n8n-workflow';
 
 // One-click sign-in with a Carbone account, Carbone Cloud only:
 // - n8n Cloud fills the inherited Client ID and Client Secret with Carbone's managed app (classic OAuth2)
-// - without them, n8n 3.2+ registers itself on Carbone Account (Dynamic Client Registration, PKCE)
+// - without them, n8n 2.49+ registers itself on Carbone Account (Dynamic Client Registration, PKCE)
 export class CarboneOAuth2Api implements ICredentialType {
 	name = 'carboneOAuth2Api';
 
@@ -64,13 +64,6 @@ export class CarboneOAuth2Api implements ICredentialType {
 			name: 'authentication',
 			type: 'hidden',
 			default: 'header',
-		},
-		{
-			// The OAuth2 token is a Carbone Cloud token: On-Premise instances use the API key credential
-			displayName: 'API URL',
-			name: 'apiUrl',
-			type: 'hidden',
-			default: 'https://api.carbone.io',
 		},
 	];
 }

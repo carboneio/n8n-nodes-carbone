@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    # Supply-chain safety: only propose versions published at least 2 weeks ago
+    cooldown:
+      default-days: 14
+    groups:
+      dev-dependencies:
+        dependency-type: 'development'
+        patterns:
+          - '*'
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    cooldown:
+      default-days: 14
+    groups:
+      github-actions:
+        patterns:
+          - '*'
